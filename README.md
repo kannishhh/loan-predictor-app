@@ -42,7 +42,7 @@ A full-stack Loan Prediction web application built with **React(Vite + Tailwind 
 
 ## 📁 Folder Structure
 
-````bash
+```bash
 root/
 │
 ├── backend/ #Flask Backend
