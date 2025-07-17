@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Repayment Prediction</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        @media (max-width: 576px) {
+            .container {
+                padding: 15px;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Loan Repayment Prediction</h1>
+        <form id="loanForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="credit_policy" class="form-label">Credit Policy (0 or 1)</label>
+                    <input type="number" class="form-control" id="credit_policy" name="credit.policy" min="0" max="1" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="purpose" class="form-label">Purpose</label>
+                    <select class="form-select" id="purpose" name="purpose" required>
+                        <option value="" disabled selected>Select purpose</option>
+                        <option value="debt_consolidation">Debt Consolidation</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="all_other">All Other</option>
+                        <option value="home_improvement">Home Improvement</option>
+                        <option value="small_business">Small Business</option>
+                        <option value="major_purchase">Major Purchase</option>
+                        <option value="educational">Educational</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="int_rate" class="form-label">Interest Rate (e.g., 0.1189)</label>
+                    <input type="number" step="0.0001" class="form-control" id="int_rate" name="int.rate" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="installment" class="form-label">Installment (e.g., 829.10)</label>
+                    <input type="number" step="0.01" class="form-control" id="installment" name="installment" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="log_annual_inc" class="form-label">Log Annual Income (e.g., 11.350407)</label>
+                    <input type="number" step="0.000001" class="form-control" id="log_annual_inc" name="log.annual.inc" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="dti" class="form-label">Debt-to-Income Ratio (e.g., 19.48)</label>
+                    <input type="number" step="0.01" class="form-control" id="dti" name="dti" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="fico" class="form-label">FICO Score (e.g., 737)</label>
+                    <input type="number" class="form-control" id="fico" name="fico" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="days_with_cr_line" class="form-label">Days with Credit Line (e.g., 5639.958333)</label>
+                    <input type="number" step="0.000001" class="form-control" id="days_with_cr_line" name="days.with.cr.line" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="revol_bal" class="form-label">Revolving Balance (e.g., 28854)</label>
+                    <input type="number" class="form-control" id="revol_bal" name="revol.bal" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="revol_util" class="form-label">Revolving Utilization (e.g., 52.1)</label>
+                    <input type="number" step="0.1" class="form-control" id="revol_util" name="revol.util" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="inq_last_6mths" class="form-label">Inquiries in Last 6 Months (e.g., 0)</label>
+                    <input type="number" class="form-control" id="inq_last_6mths" name="inq.last.6mths" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="delinq_2yrs" class="form-label">Delinquencies in Last 2 Years (e.g., 0)</label>
+                    <input type="number" class="form-control" id="delinq_2yrs" name="delinq.2yrs" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="pub_rec" class="form-label">Public Records (e.g., 0)</label>
+                    <input type="number" class="form-control" id="pub_rec" name="pub.rec" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Predict</button>
+        </form>
+        <div id="result" class="alert" role="alert"></div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#loanForm').submit(function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.error) {
+                            $('#result').removeClass('alert-success alert-danger').addClass('alert-danger').text(response.error).show();
+                        } else {
+                            const resultClass = response.result.includes('Likely to be Repaid') ? 'alert-success' : 'alert-danger';
+                            $('#result').removeClass('alert-success alert-danger').addClass(resultClass)
+                                .html(`${response.result}<br><small>${response.confidence}</small>`).show();
+                        }
+                    },
+                    error: function() {
+                        $('#result').removeClass('alert-success alert-danger').addClass('alert-danger')
+                            .text('An error occurred while processing the request.').show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
