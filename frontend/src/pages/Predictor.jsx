@@ -176,10 +176,10 @@ const Predictor = ({ onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex items-center justify-center flex-col">
-      <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-4xl font-extrabold text-blue-700 tracking-wide text-center">
+    <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center justify-center ">
+      <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-xl">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-extrabold text-blue-700 tracking-wide">
             Loan Repayment Predictor
           </h1>
           <button
@@ -187,33 +187,40 @@ const Predictor = ({ onLogout }) => {
               localStorage.setItem("isLoggedIn", "false");
               onLogout();
             }}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform"
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out"
           >
             Logout
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
-          <label className="block">
-            <span className="text-gray-700">{labelMap["credit.policy"]}</span>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
+          <div>
+            <label
+              htmlFor="credit.policy"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              {labelMap["credit.policy"]}
+            </label>
             <select
               name="credit.policy"
               value={form["credit.policy"]}
               onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded p-2"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-right focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value={1}>Meets Credit Policy</option>
               <option value={0}>Does Not Meet Policy</option>
             </select>
-          </label>
+          </div>
 
-          <label className="block">
-            <span className="text-gray-700">{labelMap["purpose"]}</span>
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              {labelMap["purpose"]}
+            </label>
             <select
               name="purpose"
               value={form.purpose}
               onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded p-2"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-right focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {purposeOptions.map((p) => (
                 <option key={p} value={p}>
@@ -221,102 +228,134 @@ const Predictor = ({ onLogout }) => {
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
           {Object.keys(initialForm)
             .filter((key) => key !== "purpose" && key !== "credit.policy")
             .map((key) => (
-              <label key={key} className="block">
-                <span className="text-gray-700">{labelMap[key]}</span>
+              <div key={key}>
+                <label
+                  key={key}
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                >
+                  {labelMap[key]}
+                </label>
                 <input
                   type="number"
                   name={key}
                   value={form[key]}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded p-2"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
-              </label>
+              </div>
             ))}
 
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
-          >
-            {loading ? "Predicting..." : "Predict"}
-          </button>
+          <div className="text-center mt-4">
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+            >
+              {loading ? "Predicting..." : "Predict"}
+            </button>
+          </div>
         </form>
 
-        {result && !result.error && (
-          <div>
-            {result.result?.includes("Repaid") && (
-              <Confetti
-                width={width}
-                height={height}
-                recycle={false}
-                numberOfPieces={300}
-                gravity={0.5}
-              />
-            )}
-            <div
-              id="pdf-result"
-              ref={pdfRef}
-              className={`p-6 rounded-lg shadow-md text-white mt-8 transition duration-300 ${
-                result.result?.includes("Repaid")
-                  ? "bg-green-500"
-                  : "bg-red-500"
-              }`}
-            >
-              <div className="text-3xl mb-2">
-                {result.result.includes("Repaid") ? (
-                  <FontAwesomeIcon icon={faCheckCircle} />
-                ) : (
-                  <FontAwesomeIcon icon={faTriangleExclamation} />
+        {result && (
+          <div className="mt-8">
+            {result.error ? (
+              <div className="p-6 rounded-lg shadow-md bg-red-500 text-white text-center">
+                <FontAwesomeIcon
+                  icon={faTriangleExclamation}
+                  className="text-3xl mb-2"
+                />
+                <h2 className="text-xl font-semibold">Error: {result.error}</h2>
+                <p className="text-sm mt-2">
+                  Please check your inputs and try again.
+                </p>
+              </div>
+            ) : (
+              <>
+                {result.result?.includes("Repaid") && (
+                  <Confetti
+                    width={width}
+                    height={height}
+                    recycle={false}
+                    numberOfPieces={300}
+                    gravity={0.5}
+                  />
                 )}
-              </div>
-              <h2 className="text-xl font-semibold">{result.result}</h2>
-              <p className="text-sm mt-2">{result.confidence}</p>
-              <div className="w-full bg-white/30 h-3 mt-4 rounded overflow-hidden">
-                {(() => {
-                  const percentage = parseFloat(
-                    result.confidence?.replace(/[^\d.]/g, "")
-                  );
-                  return (
-                    <div
-                      className={`h-full ${
-                        result.result.includes("Repaid")
-                          ? "bg-white"
-                          : "bg-yellow-300"
-                      }`}
-                      style={{
-                        width: `${percentage || 0}%`,
-                        transition: "width 0.8s ease-in-out",
-                      }}
-                    ></div>
-                  );
-                })()}
-              </div>
-            </div>
-            <button
-              onClick={handleDownloadPDF}
-              disabled={pdfLoading}
-              className={`mt-4 px-6 py-2 text-white rounded transition-colors ${
-                pdfLoading
-                  ? "bg-gray-500 cursor-not-allowed"
-                  : "bg-gray-800 hover:bg-gray-700 cursor-pointer"
-              }`}
-            >
-              {pdfLoading ? "Generating PDF..." : "Download as PDF"}
-            </button>
+                <div
+                  id="pdf-result"
+                  ref={pdfRef}
+                  className={`p-6 rounded-lg shadow-md text-white transition duration-300 ${
+                    result.result?.includes("Repaid")
+                      ? "bg-green-500"
+                      : "bg-red-500"
+                  }`}
+                >
+                  <div className="text-3xl mb-2 text-center">
+                    {result.result.includes("Repaid") ? (
+                      <FontAwesomeIcon icon={faCheckCircle} />
+                    ) : (
+                      <FontAwesomeIcon icon={faTriangleExclamation} />
+                    )}
+                  </div>
+                  <h2 className="text-xl font-semibold text-center">
+                    {result.result}
+                  </h2>
+                  <p className="text-sm mt-2 text-center">
+                    {result.confidence}
+                  </p>
+                  <div className="w-full bg-white/30 h-3 mt-4 rounded overflow-hidden">
+                    {(() => {
+                      const percentage = parseFloat(
+                        result.confidence?.replace(/[^\d.]/g, "")
+                      );
+                      return (
+                        <div
+                          className={`h-full ${
+                            result.result.includes("Repaid")
+                              ? "bg-white"
+                              : "bg-yellow-300"
+                          }`}
+                          style={{
+                            width: `${percentage || 0}%`,
+                            transition: "width 0.8s ease-in-out",
+                          }}
+                        ></div>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                <div className="text-center mt-4">
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={pdfLoading}
+                    className={`mt-4 px-6 py-2 text-white rounded transition-colors ${
+                      pdfLoading
+                        ? "bg-gray-500 cursor-not-allowed"
+                        : "bg-gray-800 hover:bg-gray-700 cursor-pointer"
+                    }`}
+                  >
+                    {pdfLoading ? "Generating PDF..." : "Download as PDF"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
-      <Link
-        to="/history"
-        className="text-blue-600 hover:text-blue-800 font-medium mt-4 inline-block px-4 py-2 rounded-md border border-blue-600 hover:border-blue-800 transition duration-300 ease-in-out"
-      >
-        View Prediction History
-      </Link>
+
+      <div className="mt-8 text-center">
+        <Link
+          to="/history"
+          className="text-blue-600 hover:text-blue-800 font-medium inline-block px-4 py-2 rounded-md border border-blue-600 hover:border-blue-800 transition duration-300 ease-in-out"
+        >
+          View Prediction History
+        </Link>
+      </div>
     </div>
   );
 };
