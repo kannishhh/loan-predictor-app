@@ -4,9 +4,18 @@ from flask_cors import CORS
 import joblib
 import pandas as pd
 import numpy as np
+from routes.admin_stats import admin_stats_bp
+from routes.admin_feedback import feedback_bp 
+from routes.admin_predictions import predictions_bp
+from routes.admin_users import admin_users
 
 app = Flask(__name__)
 CORS(app)
+
+app.register_blueprint(admin_stats_bp)
+app.register_blueprint(feedback_bp)
+app.register_blueprint(predictions_bp)
+app.register_blueprint(admin_users)
 
 # Load the model, scaler, and label encoder
 model = joblib.load('models/random_forest_model.pkl')
@@ -139,7 +148,21 @@ def history():
         save_history(new_history)
         return jsonify({"message": "History cleared successfully"})
 
+@app.route("/admin/predictions", methods=["GET"])
+def get_all_predictions():
+    try:
+        with open("users.json", "r") as f:
+            users_data =json.load(f)
+        all_predictions =[]
 
+        for user, records in users_data.items():
+            for r in records:
+                r["user"] = user
+                all_predictions.apend(r)
+
+        return jsonify({"success":True, "data":all_predictions[::-1]})
+    except Exception as e:
+        return jsonify({"success":False, "error":str(e)}),500
 
 if __name__ == '__main__':
     app.run(debug=True)

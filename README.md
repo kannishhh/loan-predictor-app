@@ -45,26 +45,26 @@ A full-stack Loan Prediction web application built with **React(Vite + Tailwind 
 ```bash
 root/
 │
-├── backend/ #Flask Backend
-│ ├── data/ #Raw or processed datasets
-│ ├── models/ #Trained model files (e.g., model.pkl, scaler.pkl)
-│ ├── templates/ #HTMLtemplates for Flask
-│ ├── app.py #Main Flask app
-│ ├── generate_pkl.py #Script to train and save model
-│ └── loan_data.csv #Dataset used for training
+├── backend/ # Flask Backend
+│ ├── data/ # Raw or processed datasets
+│ ├── models/ # Trained model files (e.g., model.pkl, scaler.pkl)
+│ ├── templates/ # HTMLtemplates for Flask
+│ ├── app.py # Main Flask app
+│ ├── generate_pkl.py # Script to train and save model
+│ └── loan_data.csv # Dataset used for training
 │
-├── frontend/ #Vite + React Frontend
+├── frontend/ # Vite + React Frontend
 │ ├── src/
-│ │ ├── components/ #Reusable UI components
-│ │ ├── pages/ #Main pages (Home, Predictor, History)
+│ │ ├── components/ # Reusable UI components
+│ │ ├── pages/ # Main pages (Home, Predictor, History)
 │ │ └── App.jsx
 │ ├── public/
 │ └── index.html
 │
-├── .gitignore #Ignore node_modules, pycache, etc.
-├── Loan_Repayment_Prediction.ipynb #Jupyter notebook used for ML training
-├── Loan_Repayment_Prediction.pdf #PDF report
-├── requirements.txt #Backend dependencies
+├── .gitignore # Ignore node_modules, pycache, etc.
+├── Loan_Repayment_Prediction.ipynb # Jupyter notebook used for ML training
+├── Loan_Repayment_Prediction.pdf # PDF report
+├── requirements.txt # Backend dependencies
 └── README.md
 ```
 
@@ -88,13 +88,13 @@ npm run dev
 
 ---
 
-📜 License
+## 📜 License
 This project is for educational purposes only.
 Feel free to fork, modify, and build on it as you wish! 🙌
 
 ---
 
-🙋‍♂️ Author
+## 🙋‍♂️ Author
 Made with ❤️ by Kanish Kainth
 - 🔗 GitHub: kannishhh
 - 📧 Email: knshkainth2002@gmail.com

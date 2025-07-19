@@ -1,65 +1,29 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import toast from "react-hot-toast";
-import Confetti from "react-confetti";
-import { useWindowSize } from "@uidotdev/usehooks";
 import { Link } from "react-router-dom";
-import { useRef } from "react";
-import html2canvas from "html2canvas-pro";
-import jsPDF from "jspdf";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCheckCircle,
-  faTriangleExclamation,
-} from "@fortawesome/free-solid-svg-icons";
+  ChartPieIcon,
+  ArrowLeftStartOnRectangleIcon,
+  RocketLaunchIcon,
+  ClockIcon,
+  GlobeAltIcon,
+} from "@heroicons/react/24/outline";
 
-const initialForm = {
-  "credit.policy": 1,
-  purpose: "credit_card",
-  "int.rate": "",
-  installment: "",
-  "log.annual.inc": "",
-  dti: "",
-  fico: "",
-  "days.with.cr.line": "",
-  "revol.bal": "",
-  "revol.util": "",
-  "inq.last.6mths": "",
-  "delinq.2yrs": "",
-  "pub.rec": "",
-};
-
-const purposeOptions = [
-  "credit_card",
-  "debt_consolidation",
-  "educational",
-  "home_improvement",
-  "major_purchase",
-  "small_business",
-  "all_other",
-];
-
-const labelMap = {
-  "credit.policy": "CREDIT POLICY APPROVAL",
-  purpose: "LOAN PURPOSE",
-  "int.rate": "INTEREST RATE (%)",
-  installment: "MONTHLY INSTALLMENT (₹)",
-  "log.annual.inc": "LOG OF ANNUAL INCOME",
-  dti: "DEBT TO INCOME RATIO (%)",
-  fico: "FICO SCORE",
-  "days.with.cr.line": "DAYS WITH CREDIT LINE",
-  "revol.bal": "REVOLVING BALANCE (₹)",
-  "revol.util": "REVOLVING CREDIT UTILIZATION (%)",
-  "inq.last.6mths": "INQUIRIES IN LAST 6 MONTHS",
-  "delinq.2yrs": "DELINQUENCIES IN LAST 2 YEARS",
-  "pub.rec": "PUBLIC RECORDS",
-};
+import PredictorInputs from "../components/predictor/PredictorInputs";
+import PredictionResult from "../components/predictor/PredictionResult";
+import {
+  initialForm,
+  purposeOptions,
+  labelMap,
+  getIconForField,
+} from "../constants/predictorConstants";
+import PredictorSelector from "../components/predictor/predictorSelector";
 
 const Predictor = ({ onLogout }) => {
   const [form, setForm] = useState(initialForm);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const { width, height } = useWindowSize();
 
   const pdfRef = useRef();
 
@@ -76,46 +40,6 @@ const Predictor = ({ onLogout }) => {
     });
   };
 
-  const handleDownloadPDF = async () => {
-    if (!pdfRef.current) {
-      toast.error("Unable to generate PDF. Please try again.");
-      return;
-    }
-
-    setPdfLoading(true);
-
-    try {
-      const element = pdfRef.current;
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const html2canvasOptions = {
-        scale: 1,
-        useCORS: true,
-      };
-
-      const canvas = await html2canvas(element, html2canvasOptions);
-
-      const imgData = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF({
-        orientation: "p",
-        unit: "px",
-        format: [canvas.width, canvas.height],
-      });
-
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-      pdf.save("loan_prediction_result.pdf");
-
-      toast.success("PDF downloaded successfully!");
-    } catch (error) {
-      console.error("PDF generation error:", error);
-      toast.error("Failed to generate PDF. Please try again.");
-    } finally {
-      setPdfLoading(false);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -126,7 +50,7 @@ const Predictor = ({ onLogout }) => {
       if (
         value === "" ||
         value === null ||
-        (typeof value === "number" && isNaN(form[key]))
+        (typeof value === "number" && isNaN(value))
       ) {
         toast.error(`Please enter a valid value for ${labelMap[key] || key}`);
         setLoading(false);
@@ -134,23 +58,15 @@ const Predictor = ({ onLogout }) => {
       }
     }
 
-    localStorage.setItem("userEmail", form.email);
-
-    const email = localStorage.getItem("userEmail");
-
-    await fetch("http://localhost:5000/predict", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-User-Email": email || "guest",
-      },
-      body: JSON.stringify(form),
-    });
+    const userEmail = localStorage.getItem("userEmail") || "guest";
 
     try {
       const response = await fetch("http://localhost:5000/predict", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Email": userEmail,
+        },
         body: JSON.stringify(form),
       });
 
@@ -161,25 +77,30 @@ const Predictor = ({ onLogout }) => {
         const entry = {
           ...data,
           timestamp: new Date().toLocaleString(),
+          input: form,
         };
         const oldHistory = JSON.parse(localStorage.getItem("history") || "[]");
         const newHistory = [entry, ...oldHistory];
         localStorage.setItem("history", JSON.stringify(newHistory));
       } else {
         setResult({ error: data.error || "Prediction failed." });
+        toast.error(data.error || "Prediction failed.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Prediction server error:", error);
       setResult({ error: "Server error. Please try again later." });
+      toast.error("Server error. Please try again later.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center justify-center ">
-      <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-xl">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-extrabold text-blue-700 tracking-wide">
+    <div className="min-h-screen bg-gray-100 font-sans p-6 flex flex-col items-center">
+      <div className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05),0_10px_15px_rgba(0,0,0,0.03)] transform transition-all duration-300 ease-in-out hover:shadow-[0_6px_8px_rgba(0,0,0,0.07),_0_12px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex justify-between items-center mb-10 border-b border-gray-500 pb-6">
+          <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight flex items-center">
+            <ChartPieIcon className="h-10 w-10 text-purple-500 mr-3" />
             Loan Repayment Predictor
           </h1>
           <button
@@ -187,173 +108,91 @@ const Predictor = ({ onLogout }) => {
               localStorage.setItem("isLoggedIn", "false");
               onLogout();
             }}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out"
+            className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
           >
-            Logout
+            <ArrowLeftStartOnRectangleIcon className="h-5 w-5" />
+            <span>Logout</span>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
-          <div>
-            <label
-              htmlFor="credit.policy"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              {labelMap["credit.policy"]}
-            </label>
-            <select
-              name="credit.policy"
-              value={form["credit.policy"]}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value={1}>Meets Credit Policy</option>
-              <option value={0}>Does Not Meet Policy</option>
-            </select>
-          </div>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
+        >
+          <PredictorSelector
+            name="credit.policy"
+            label={labelMap["credit.policy"]}
+            value={form["credit.policy"]}
+            onChange={handleChange}
+            options={[1, 0]}
+            IconComponent={GlobeAltIcon}
+            capitalizeOptions={false}
+          />
 
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {labelMap["purpose"]}
-            </label>
-            <select
-              name="purpose"
-              value={form.purpose}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {purposeOptions.map((p) => (
-                <option key={p} value={p}>
-                  {p.replace("_", " ").toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </div>
+          <PredictorSelector
+            name="purpose"
+            label={labelMap.purpose}
+            value={form.purpose}
+            onChange={handleChange}
+            options={purposeOptions}
+            IconComponent={GlobeAltIcon}
+            capitalizeOptions={true}
+          />
 
           {Object.keys(initialForm)
             .filter((key) => key !== "purpose" && key !== "credit.policy")
             .map((key) => (
-              <div key={key}>
-                <label
-                  key={key}
-                  className="block text-gray-700 text-sm font-bold mb-2"
-                >
-                  {labelMap[key]}
-                </label>
-                <input
-                  type="number"
-                  name={key}
-                  value={form[key]}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-right focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
+              <PredictorInputs
+                key={key}
+                name={key}
+                label={labelMap[key]}
+                value={form[key]}
+                onChange={handleChange}
+                IconComponent={getIconForField(key)}
+                type="number"
+                required
+                step="any"
+              />
             ))}
 
-          <div className="text-center mt-4">
+          <div className="md:col-span-2 text-center mt-6">
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+              className="flex items-center justify-center space-x-3 bg-purple-500 hover:bg-purple-800 text-white font-bold py-3 px-8 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              disabled={loading}
             >
-              {loading ? "Predicting..." : "Predict"}
+              {loading ? (
+                <>
+                  <RocketLaunchIcon className="h-6 w-6 animate-spin" />
+                  <span>Predicting...</span>
+                </>
+              ) : (
+                <>
+                  <RocketLaunchIcon className="h-6 w-6" />
+                  <span>Predict</span>
+                </>
+              )}
             </button>
           </div>
         </form>
 
         {result && (
-          <div className="mt-8">
-            {result.error ? (
-              <div className="p-6 rounded-lg shadow-md bg-red-500 text-white text-center">
-                <FontAwesomeIcon
-                  icon={faTriangleExclamation}
-                  className="text-3xl mb-2"
-                />
-                <h2 className="text-xl font-semibold">Error: {result.error}</h2>
-                <p className="text-sm mt-2">
-                  Please check your inputs and try again.
-                </p>
-              </div>
-            ) : (
-              <>
-                {result.result?.includes("Repaid") && (
-                  <Confetti
-                    width={width}
-                    height={height}
-                    recycle={false}
-                    numberOfPieces={300}
-                    gravity={0.5}
-                  />
-                )}
-                <div
-                  id="pdf-result"
-                  ref={pdfRef}
-                  className={`p-6 rounded-lg shadow-md text-white transition duration-300 ${
-                    result.result?.includes("Repaid")
-                      ? "bg-green-500"
-                      : "bg-red-500"
-                  }`}
-                >
-                  <div className="text-3xl mb-2 text-center">
-                    {result.result.includes("Repaid") ? (
-                      <FontAwesomeIcon icon={faCheckCircle} />
-                    ) : (
-                      <FontAwesomeIcon icon={faTriangleExclamation} />
-                    )}
-                  </div>
-                  <h2 className="text-xl font-semibold text-center">
-                    {result.result}
-                  </h2>
-                  <p className="text-sm mt-2 text-center">
-                    {result.confidence}
-                  </p>
-                  <div className="w-full bg-white/30 h-3 mt-4 rounded overflow-hidden">
-                    {(() => {
-                      const percentage = parseFloat(
-                        result.confidence?.replace(/[^\d.]/g, "")
-                      );
-                      return (
-                        <div
-                          className={`h-full ${
-                            result.result.includes("Repaid")
-                              ? "bg-white"
-                              : "bg-yellow-300"
-                          }`}
-                          style={{
-                            width: `${percentage || 0}%`,
-                            transition: "width 0.8s ease-in-out",
-                          }}
-                        ></div>
-                      );
-                    })()}
-                  </div>
-                </div>
-
-                <div className="text-center mt-4">
-                  <button
-                    onClick={handleDownloadPDF}
-                    disabled={pdfLoading}
-                    className={`mt-4 px-6 py-2 text-white rounded transition-colors ${
-                      pdfLoading
-                        ? "bg-gray-500 cursor-not-allowed"
-                        : "bg-gray-800 hover:bg-gray-700 cursor-pointer"
-                    }`}
-                  >
-                    {pdfLoading ? "Generating PDF..." : "Download as PDF"}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <PredictionResult
+            result={result}
+            pdfRef={pdfRef}
+            pdfLoading={pdfLoading}
+            setPdfLoading={setPdfLoading}
+          />
         )}
       </div>
 
-      <div className="mt-8 text-center">
+      <div className="mt-12 text-center">
         <Link
           to="/history"
-          className="text-blue-600 hover:text-blue-800 font-medium inline-block px-4 py-2 rounded-md border border-blue-600 hover:border-blue-800 transition duration-300 ease-in-out"
+          className="inline-flex items-center space-x-2 text-purple-500 hover:text-purple-800 font-medium px-6 py-3 rounded-lg border-2 border-purple-500 hover:border-purple-800 transition duration-300 ease-in-out shadow-sm hover:shadow-md"
         >
-          View Prediction History
+          <ClockIcon className="h-5 w-5" />
+          <span>View Prediction History</span>
         </Link>
       </div>
     </div>

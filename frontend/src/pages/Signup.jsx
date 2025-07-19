@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import {
+  UserPlusIcon,
+  EnvelopeIcon,
+  LockClosedIcon,
+  ArrowRightEndOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 
 const Signup = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -33,50 +39,98 @@ const Signup = () => {
       } else {
         toast.error(data.error || "Signup failed");
       }
-    } catch {
+    } catch (error) {
+      console.error("Signup server error:", error);
       toast.error("Server error. Try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
-      <form
-        onSubmit={handleSignup}
-        className="bg-white p-8 rounded shadow-md w-full max-w-sm space-y-4"
-      >
-        <h2 className="text-xl font-semibold text-center text-blue-600">Signup</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 font-sans p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05),0_10px_15px_rgba(0,0,0,0.03)] p-8 md:p-10 transform transition-all duration-300 ease-in-out hover:shadow-[0 6px 8px rgba(0, 0, 0, 0.07), 0 12px 20px rgba(0, 0, 0, 0.05)]">
+        <div className="text-center mb-8">
+          <UserPlusIcon className="h-16 w-16 text-purple-500 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold text-gray-800">
+            Create Your Account
+          </h2>
+          <p className="text-gray-600 text-sm mt-2">
+            Join us and start your journey!
+          </p>
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full border p-2 rounded"
-          value={form.email}
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="w-full border p-2 rounded"
-          value={form.password}
-          onChange={handleChange}
-        />
+        <form onSubmit={handleSignup} className="space-y-6">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-800 mb-2"
+            >
+              Email Address
+            </label>
+            <div className="relative">
+              <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="your@example.com"
+                className="w-full pl-10 pr-4 py-2 border border-gray-500 rounded-lg
+                           focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
+                           text-gray-800 transition-all duration-200 ease-in-out"
+                autoComplete="username"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Signup
-        </button>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-800 mb-2"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                className="w-full pl-10 pr-4 py-2 border border-gray-500 rounded-lg
+                           focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
+                           text-gray-800 transition-all duration-200 ease-in-out"
+                autoComplete="new-password"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
 
-        <p className="text-sm text-center">
+          <button
+            type="submit"
+            className="w-full flex items-center justify-center space-x-2 px-4 py-2
+                       bg-purple-500 text-white font-semibold rounded-lg shadow-[0_4px_6px_rgba(0,0,0,0.05),0_10px_15px_rgba(0,0,0,0.03)]
+                       hover:bg-purple-800 focus:outline-none focus:ring-2
+                       focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out"
+          >
+            <ArrowRightEndOnRectangleIcon className="h-5 w-5 -rotate-90 transform" />
+            <span>Sign Up</span>
+          </button>
+        </form>
+
+        <p className="mt-8 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
+          <Link
+            to="/login"
+            className="font-medium text-purple-500 hover:underline"
+          >
             Login
           </Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 };
