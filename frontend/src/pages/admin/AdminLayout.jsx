@@ -40,22 +40,16 @@ SidebarItem.propTypes = {
   end: PropTypes.bool,
 };
 
-const AdminLayout = () => {
+const AdminLayout = ({ onAdminLogout }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminLoggedIn");
-    if (!isAdmin) {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
       toast.error("Access Denied! Please log in.");
-      navigate("/admin-login");
+      navigate("/admin-login", { replace: true });
     }
   }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("isAdminLoggedIn");
-    toast.success("Logged out successfully!");
-    navigate("/login");
-  };
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
@@ -89,7 +83,7 @@ const AdminLayout = () => {
 
         <div className="mt-auto pt-6 border-t border-gray-700">
           <button
-            onClick={handleLogout}
+            onClick={onAdminLogout}
             className="flex items-center space-x-3 p-3 w-full text-left bg-red-600/10 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-all duration-200 ease-in-out font-medium"
           >
             <ArrowRightStartOnRectangleIcon className="h-6 w-6" />
@@ -102,7 +96,11 @@ const AdminLayout = () => {
         <Outlet />
       </main>
     </div>
-  )
+  );
+};
+
+AdminLayout.propTypes = {
+  onAdminLogout: PropTypes.func.isRequired,
 };
 
 export default AdminLayout;

@@ -35,9 +35,11 @@ const Login = ({ setIsLoggedIn }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success("Login successful!");
+        localStorage.setItem("userToken", data.access_token);
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", form.email);
         setIsLoggedIn(true);
+        toast.success("Login successful!");
         navigate("/predict");
       } else {
         toast.error(data.error || "Invalid credentials");
@@ -49,9 +51,10 @@ const Login = ({ setIsLoggedIn }) => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100 font-sans">
+    <div className="min-h-screen flex bg-gray-50 font-sans">
       <div
-        className="hidden lg:flex w-1/2 bg-gradient-to-br from-purple-500 to-teal-400 items-center justify-center p-8 relative overflow-hidden"
+        className="hidden lg:flex w-1/2 bg-gradient-to-br from-purple-500 to-teal-400
+                      items-center justify-center p-8 relative overflow-hidden"
       >
         <div
           className="absolute inset-0 opacity-10"
@@ -61,7 +64,7 @@ const Login = ({ setIsLoggedIn }) => {
           }}
         ></div>
 
-        <div className="text-center text-white relative z-10 p-6 rounded-lg bg-black/20">
+        <div className="text-center text-white relative z-10 p-6 rounded-lg bg-black bg-opacity-20">
           <UserCircleIcon className="h-24 w-24 mx-auto mb-6 opacity-90" />
           <h2 className="text-4xl font-extrabold mb-4 leading-tight">
             Welcome Back!
@@ -73,8 +76,8 @@ const Login = ({ setIsLoggedIn }) => {
       </div>
 
       <div className="flex-1 flex items-center justify-center p-8 lg:p-12">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-[0_4px_6px_rgba(0,0,0,0.05),0_10px_15px_rgba(0,0,0,0.03)] p-8 md:p-10 transform transition-all duration-300 ease-in-out hover:shadow-[0 6px 8px rgba(0, 0, 0, 0.07), 0 12px 20px rgba(0, 0, 0, 0.05)">
-          <h2 className="text-3xl font-bold text-gray-800 text-center mb-8">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 md:p-10 transform transition-all duration-300 ease-in-out hover:shadow-xl">
+          <h2 className="text-3xl font-bold text-gray-700 text-center mb-8">
             Login to Your Account
           </h2>
 
@@ -82,20 +85,20 @@ const Login = ({ setIsLoggedIn }) => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-800 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Email Address
               </label>
               <div className="relative">
-                <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
+                <EnvelopeIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <input
                   type="email"
                   id="email"
                   name="email"
                   placeholder="your@example.com"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-500 rounded-lg
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg
                              focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
-                             text-gray-800 transition-all duration-200 ease-in-out"
+                             text-gray-700 transition-all duration-200 ease-in-out"
                   autoComplete="username"
                   value={form.email}
                   onChange={handleChange}
@@ -107,20 +110,20 @@ const Login = ({ setIsLoggedIn }) => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-800 mb-2"
+                className="block text-sm font-medium text-gray-700 mb-2"
               >
                 Password
               </label>
               <div className="relative">
-                <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
+                <LockClosedIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                 <input
                   type="password"
                   id="password"
                   name="password"
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2 border border-gray-500 rounded-lg
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg
                              focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
-                             text-gray-800 transition-all duration-200 ease-in-out"
+                             text-gray-700 transition-all duration-200 ease-in-out"
                   autoComplete="current-password"
                   value={form.password}
                   onChange={handleChange}
@@ -129,20 +132,11 @@ const Login = ({ setIsLoggedIn }) => {
               </div>
             </div>
 
-            <div className="text-right text-sm">
-              <Link
-                to="/forgot-password"
-                className="font-medium text-purple-500 hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
             <button
               type="submit"
               className="w-full flex items-center justify-center space-x-2 px-4 py-2
-                         bg-purple-500 text-white font-semibold rounded-lg shadow-[0_4px_6px_rgba(0,0,0,0.05),0_10px_15px_rgba(0,0,0,0.03)]
-                         hover:bg-purple-800 focus:outline-none focus:ring-2
+                         bg-purple-500 text-white font-semibold rounded-lg shadow-md
+                         hover:bg-purple-600 focus:outline-none focus:ring-2
                          focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out"
             >
               <ArrowRightEndOnRectangleIcon className="h-5 w-5" />
@@ -150,7 +144,7 @@ const Login = ({ setIsLoggedIn }) => {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-gray-600">
+          <p className="mt-8 text-center text-sm text-gray-500">
             Don't have an account?{" "}
             <Link
               to="/signup"
@@ -159,7 +153,7 @@ const Login = ({ setIsLoggedIn }) => {
               Signup
             </Link>
           </p>
-          <p className="text-center text-sm text-gray-600 mt-2">
+          <p className="text-center text-sm text-gray-500 mt-2">
             Are you an admin?{" "}
             <Link
               to="/admin-login"

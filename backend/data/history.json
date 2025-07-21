@@ -1,1 +1,506 @@
-[{"email": "guest", "input": {"credit.policy": 1, "purpose": "home_improvement", "int.rate": 6.5, "installment": 200, "log.annual.inc": 10.5, "dti": 12, "fico": 720, "days.with.cr.line": 2400, "revol.bal": 15000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "40.50% chance of non-repayment", "timestamp": "2025-07-16 15:43:30"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6.5, "installment": 200, "log.annual.inc": 10.5, "dti": 12, "fico": 720, "days.with.cr.line": 2400, "revol.bal": 15000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 16:30:06"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6.5, "installment": 200, "log.annual.inc": 10.5, "dti": 12, "fico": 720, "days.with.cr.line": 2400, "revol.bal": 15000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 1, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "39.00% chance of non-repayment", "timestamp": "2025-07-16 16:31:37"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6.5, "installment": 200, "log.annual.inc": 19, "dti": 10, "fico": 720, "days.with.cr.line": 2400, "revol.bal": 15000, "revol.util": 30, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "37.67% chance of non-repayment", "timestamp": "2025-07-16 16:41:24"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "educational", "int.rate": 6, "installment": 2000, "log.annual.inc": 10, "dti": 12, "fico": 749, "days.with.cr.line": 2000, "revol.bal": 20000, "revol.util": 20, "inq.last.6mths": 0, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "40.00% chance of non-repayment", "timestamp": "2025-07-16 16:47:01"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6.5, "installment": 3000, "log.annual.inc": 20, "dti": 12, "fico": 720, "days.with.cr.line": 2400, "revol.bal": 30000, "revol.util": 15, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "38.50% chance of non-repayment", "timestamp": "2025-07-16 17:04:43"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6.5, "installment": 3000, "log.annual.inc": 20, "dti": 12, "fico": 720, "days.with.cr.line": 2400, "revol.bal": 30000, "revol.util": 15, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "38.50% chance of non-repayment", "timestamp": "2025-07-16 17:04:54"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 7, "installment": 3000, "log.annual.inc": 20, "dti": 12, "fico": 769, "days.with.cr.line": 3000, "revol.bal": 35000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "38.50% chance of non-repayment", "timestamp": "2025-07-16 17:06:13"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6.5, "installment": 300, "log.annual.inc": 10, "dti": 10, "fico": 720, "days.with.cr.line": 1200, "revol.bal": 30000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 17:14:57"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 200, "log.annual.inc": 12, "dti": 10, "fico": 750, "days.with.cr.line": 2000, "revol.bal": 15000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 17:28:47"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 500, "log.annual.inc": 12, "dti": 10.5, "fico": 720, "days.with.cr.line": 1200, "revol.bal": 15000, "revol.util": 25, "inq.last.6mths": 1, "delinq.2yrs": 1, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "39.00% chance of non-repayment", "timestamp": "2025-07-16 17:43:34"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 300, "log.annual.inc": 2, "dti": 10.5, "fico": 750, "days.with.cr.line": 3000, "revol.bal": 20000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 18:27:48"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 10, "installment": 6000, "log.annual.inc": 20, "dti": 10.5, "fico": 729, "days.with.cr.line": 3000, "revol.bal": 50000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "38.50% chance of non-repayment", "timestamp": "2025-07-16 19:48:11"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 2000, "log.annual.inc": 10, "dti": 5, "fico": 720, "days.with.cr.line": 3000, "revol.bal": 20000, "revol.util": 12, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 21:28:07"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 2000, "log.annual.inc": 10, "dti": 5, "fico": 720, "days.with.cr.line": 3000, "revol.bal": 20000, "revol.util": 12, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 21:30:38"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 2000, "log.annual.inc": 10, "dti": 5, "fico": 720, "days.with.cr.line": 3000, "revol.bal": 20000, "revol.util": 12, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 21:30:51"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 2000, "log.annual.inc": 10, "dti": 5, "fico": 720, "days.with.cr.line": 3000, "revol.bal": 20000, "revol.util": 12, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 21:31:42"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 6, "log.annual.inc": 3, "dti": 5, "fico": 700, "days.with.cr.line": 1500, "revol.bal": 20000, "revol.util": 10, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 21:49:04"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 200, "log.annual.inc": 12, "dti": 10, "fico": 750, "days.with.cr.line": 2400, "revol.bal": 15000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 21:54:35"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 10000, "log.annual.inc": 20, "dti": 50, "fico": 900, "days.with.cr.line": 120, "revol.bal": 1500000, "revol.util": 100, "inq.last.6mths": 1, "delinq.2yrs": 1, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "33.67% chance of non-repayment", "timestamp": "2025-07-16 22:22:25"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 10000, "log.annual.inc": 20, "dti": 50, "fico": 900, "days.with.cr.line": 120, "revol.bal": 1500000, "revol.util": 100, "inq.last.6mths": 1, "delinq.2yrs": 1, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "33.67% chance of non-repayment", "timestamp": "2025-07-16 22:26:22"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 10, "installment": 10000, "log.annual.inc": 12, "dti": 8, "fico": 953, "days.with.cr.line": 100, "revol.bal": 1500000, "revol.util": 1000, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "39.50% chance of non-repayment", "timestamp": "2025-07-16 22:31:50"}, {"email": "guest", "input": {"credit.policy": 1, "purpose": "credit_card", "int.rate": 6, "installment": 1000, "log.annual.inc": 12, "dti": 6, "fico": 750, "days.with.cr.line": 5200, "revol.bal": 50000, "revol.util": 20, "inq.last.6mths": 1, "delinq.2yrs": 0, "pub.rec": 0}, "result": "Loan Likely to be Repaid", "confidence": "42.00% chance of non-repayment", "timestamp": "2025-07-16 22:45:51"}]
+[
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "home_improvement",
+            "int.rate": 6.5,
+            "installment": 200,
+            "log.annual.inc": 10.5,
+            "dti": 12,
+            "fico": 720,
+            "days.with.cr.line": 2400,
+            "revol.bal": 15000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "40.50% chance of non-repayment",
+        "timestamp": "2025-07-16 15:43:30"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6.5,
+            "installment": 200,
+            "log.annual.inc": 10.5,
+            "dti": 12,
+            "fico": 720,
+            "days.with.cr.line": 2400,
+            "revol.bal": 15000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 16:30:06"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6.5,
+            "installment": 200,
+            "log.annual.inc": 10.5,
+            "dti": 12,
+            "fico": 720,
+            "days.with.cr.line": 2400,
+            "revol.bal": 15000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 1,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "39.00% chance of non-repayment",
+        "timestamp": "2025-07-16 16:31:37"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6.5,
+            "installment": 200,
+            "log.annual.inc": 19,
+            "dti": 10,
+            "fico": 720,
+            "days.with.cr.line": 2400,
+            "revol.bal": 15000,
+            "revol.util": 30,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "37.67% chance of non-repayment",
+        "timestamp": "2025-07-16 16:41:24"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "educational",
+            "int.rate": 6,
+            "installment": 2000,
+            "log.annual.inc": 10,
+            "dti": 12,
+            "fico": 749,
+            "days.with.cr.line": 2000,
+            "revol.bal": 20000,
+            "revol.util": 20,
+            "inq.last.6mths": 0,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "40.00% chance of non-repayment",
+        "timestamp": "2025-07-16 16:47:01"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6.5,
+            "installment": 3000,
+            "log.annual.inc": 20,
+            "dti": 12,
+            "fico": 720,
+            "days.with.cr.line": 2400,
+            "revol.bal": 30000,
+            "revol.util": 15,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "38.50% chance of non-repayment",
+        "timestamp": "2025-07-16 17:04:43"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6.5,
+            "installment": 3000,
+            "log.annual.inc": 20,
+            "dti": 12,
+            "fico": 720,
+            "days.with.cr.line": 2400,
+            "revol.bal": 30000,
+            "revol.util": 15,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "38.50% chance of non-repayment",
+        "timestamp": "2025-07-16 17:04:54"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 7,
+            "installment": 3000,
+            "log.annual.inc": 20,
+            "dti": 12,
+            "fico": 769,
+            "days.with.cr.line": 3000,
+            "revol.bal": 35000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "38.50% chance of non-repayment",
+        "timestamp": "2025-07-16 17:06:13"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6.5,
+            "installment": 300,
+            "log.annual.inc": 10,
+            "dti": 10,
+            "fico": 720,
+            "days.with.cr.line": 1200,
+            "revol.bal": 30000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 17:14:57"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 200,
+            "log.annual.inc": 12,
+            "dti": 10,
+            "fico": 750,
+            "days.with.cr.line": 2000,
+            "revol.bal": 15000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 17:28:47"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 500,
+            "log.annual.inc": 12,
+            "dti": 10.5,
+            "fico": 720,
+            "days.with.cr.line": 1200,
+            "revol.bal": 15000,
+            "revol.util": 25,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 1,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "39.00% chance of non-repayment",
+        "timestamp": "2025-07-16 17:43:34"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 300,
+            "log.annual.inc": 2,
+            "dti": 10.5,
+            "fico": 750,
+            "days.with.cr.line": 3000,
+            "revol.bal": 20000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 18:27:48"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 10,
+            "installment": 6000,
+            "log.annual.inc": 20,
+            "dti": 10.5,
+            "fico": 729,
+            "days.with.cr.line": 3000,
+            "revol.bal": 50000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "38.50% chance of non-repayment",
+        "timestamp": "2025-07-16 19:48:11"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 2000,
+            "log.annual.inc": 10,
+            "dti": 5,
+            "fico": 720,
+            "days.with.cr.line": 3000,
+            "revol.bal": 20000,
+            "revol.util": 12,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 21:28:07"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 2000,
+            "log.annual.inc": 10,
+            "dti": 5,
+            "fico": 720,
+            "days.with.cr.line": 3000,
+            "revol.bal": 20000,
+            "revol.util": 12,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 21:30:38"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 2000,
+            "log.annual.inc": 10,
+            "dti": 5,
+            "fico": 720,
+            "days.with.cr.line": 3000,
+            "revol.bal": 20000,
+            "revol.util": 12,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 21:30:51"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 2000,
+            "log.annual.inc": 10,
+            "dti": 5,
+            "fico": 720,
+            "days.with.cr.line": 3000,
+            "revol.bal": 20000,
+            "revol.util": 12,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 21:31:42"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 6,
+            "log.annual.inc": 3,
+            "dti": 5,
+            "fico": 700,
+            "days.with.cr.line": 1500,
+            "revol.bal": 20000,
+            "revol.util": 10,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 21:49:04"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 200,
+            "log.annual.inc": 12,
+            "dti": 10,
+            "fico": 750,
+            "days.with.cr.line": 2400,
+            "revol.bal": 15000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 21:54:35"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 10000,
+            "log.annual.inc": 20,
+            "dti": 50,
+            "fico": 900,
+            "days.with.cr.line": 120,
+            "revol.bal": 1500000,
+            "revol.util": 100,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 1,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "33.67% chance of non-repayment",
+        "timestamp": "2025-07-16 22:22:25"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 10000,
+            "log.annual.inc": 20,
+            "dti": 50,
+            "fico": 900,
+            "days.with.cr.line": 120,
+            "revol.bal": 1500000,
+            "revol.util": 100,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 1,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "33.67% chance of non-repayment",
+        "timestamp": "2025-07-16 22:26:22"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 10,
+            "installment": 10000,
+            "log.annual.inc": 12,
+            "dti": 8,
+            "fico": 953,
+            "days.with.cr.line": 100,
+            "revol.bal": 1500000,
+            "revol.util": 1000,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "39.50% chance of non-repayment",
+        "timestamp": "2025-07-16 22:31:50"
+    },
+    {
+        "email": "guest",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 6,
+            "installment": 1000,
+            "log.annual.inc": 12,
+            "dti": 6,
+            "fico": 750,
+            "days.with.cr.line": 5200,
+            "revol.bal": 50000,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "42.00% chance of non-repayment",
+        "timestamp": "2025-07-16 22:45:51"
+    },
+    {
+        "email": "test@demo.com",
+        "input": {
+            "credit.policy": "0",
+            "purpose": "home_improvement",
+            "int.rate": 7,
+            "installment": 2000,
+            "log.annual.inc": 10,
+            "dti": 12,
+            "fico": 3000,
+            "days.with.cr.line": 30000,
+            "revol.bal": 15,
+            "revol.util": 200,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "62.67% chance of repayment",
+        "timestamp": "2025-07-21T17:58:35.203459"
+    }
+]

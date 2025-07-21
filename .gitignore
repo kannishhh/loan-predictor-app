@@ -8,6 +8,7 @@ __pycache__/
 venv/
 env/
 *.env
+.venv
 
 # VSCode
 .vscode/
@@ -21,3 +22,5 @@ users.json
 # Logs and system files
 *.log
 .DS_Store
+
+
