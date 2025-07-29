@@ -27,17 +27,17 @@ const ProtectedAdminRoute = ({ children }) => {
 // --- ProtectedUserRoute Component ---
 const ProtectedUserRoute = ({ children }) => {
   const userToken = localStorage.getItem("userToken");
-  console.log(
-    "ProtectedUserRoute: Checking userToken:",
-    userToken ? "Exists" : "Does NOT exist"
-  );
+  // console.log(
+  //   "ProtectedUserRoute: Checking userToken:",
+  //   userToken ? "Exists" : "Does NOT exist"
+  // );
   if (!userToken) {
-    console.log(
-      "ProtectedUserRoute: No userToken found, redirecting to /login"
-    );
+    // console.log(
+    //   "ProtectedUserRoute: No userToken found, redirecting to /login"
+    // );
     return <Navigate to="/login" replace />;
   }
-  console.log("ProtectedUserRoute: userToken found, rendering children.");
+  // console.log("ProtectedUserRoute: userToken found, rendering children.");
   return children;
 };
 
@@ -49,29 +49,29 @@ function App() {
     !!localStorage.getItem("adminToken")
   );
 
-  console.log("App Component Render: isAdminLoggedIn state:", isAdminLoggedIn);
+  // console.log("App Component Render: isAdminLoggedIn state:", isAdminLoggedIn);
 
   useEffect(() => {
-    console.log("App useEffect: Initializing/checking auth status...");
+    // console.log("App useEffect: Initializing/checking auth status...");
 
     const checkAuthStatus = () => {
       const userHasToken = !!localStorage.getItem("userToken");
       const adminHasToken = !!localStorage.getItem("adminToken");
 
-      console.log(
-        "App useEffect: localStorage check - userToken:",
-        userHasToken,
-        "adminToken:",
-        adminHasToken
-      );
+      // console.log(
+      //   "App useEffect: localStorage check - userToken:",
+      //   userHasToken,
+      //   "adminToken:",
+      //   adminHasToken
+      // );
 
       if (userHasToken !== isLoggedIn) {
         setIsLoggedIn(userHasToken);
-        console.log("App useEffect: setIsLoggedIn to", userHasToken);
+        // console.log("App useEffect: setIsLoggedIn to", userHasToken);
       }
       if (adminHasToken !== isAdminLoggedIn) {
         setIsAdminLoggedIn(adminHasToken);
-        console.log("App useEffect: setIsAdminLoggedIn to", adminHasToken);
+        // console.log("App useEffect: setIsAdminLoggedIn to", adminHasToken);
       }
     };
 
@@ -79,7 +79,7 @@ function App() {
     checkAuthStatus();
 
     return () => {
-      console.log("App useEffect: Cleaning up storage event listener.");
+      // console.log("App useEffect: Cleaning up storage event listener.");
       window.removeEventListener("storage", checkAuthStatus);
     };
   }, [isLoggedIn, isAdminLoggedIn]);

@@ -1,56 +1,37 @@
 import {
-  CurrencyDollarIcon,
-  BanknotesIcon,
-  CreditCardIcon,
-  CalendarDaysIcon,
-  ShieldCheckIcon,
-  ScaleIcon,
-  ChartBarSquareIcon,
-  ClockIcon,
-  ArrowPathIcon,
-  DocumentMagnifyingGlassIcon,
-  NewspaperIcon,
+  CurrencyDollarIcon,       
+  ScaleIcon,               
+  ClockIcon,                
+  BanknotesIcon,          
+  CalendarDaysIcon,        
+  ChartBarIcon,        
+  BuildingLibraryIcon,     
+  MagnifyingGlassIcon,
+  ReceiptPercentIcon,     
+  ClipboardDocumentListIcon,
+  ShieldCheckIcon,        
   TagIcon,
-  GlobeAltIcon, 
+  GlobeAltIcon,                  
 } from "@heroicons/react/24/outline";
 
-
-
-// Initial form state for the prediction inputs
+// Initial form state for the predictor
 export const initialForm = {
-  "credit.policy": null, 
-  purpose: "",
-  "int.rate": null,
-  installment: null,
-  "log.annual.inc": null,
-  dti: null,
-  fico: null,
-  "days.with.cr.line": null,
-  "revol.bal": null,
-  "revol.util": null,
-  "inq.last.6mths": null,
-  "delinq.2yrs": null,
-  "pub.rec": null,
+  "credit.policy": 1,
+  purpose: "credit_card",
+  "int.rate": "",
+  installment: "",
+  "log.annual.inc": "",
+  dti: "",
+  fico: "",
+  "days.with.cr.line": "",
+  "revol.bal": "",
+  "revol.util": "",
+  "inq.last.6mths": "",
+  "delinq.2yrs": "",
+  "pub.rec": "",
 };
 
-// Map form field names to user-friendly labels
-export const labelMap = {
-  "credit.policy": "Credit Policy (Borrower meets underwriting criteria)",
-  purpose: "Purpose of the Loan",
-  "int.rate": "Interest Rate (%)",
-  installment: "Installment",
-  "log.annual.inc": "Log of Annual Income",
-  dti: "Debt-to-Income Ratio",
-  fico: "FICO Score",
-  "days.with.cr.line": "Days with Credit Line",
-  "revol.bal": "Revolving Balance",
-  "revol.util": "Revolving Line Utilization Rate",
-  "inq.last.6mths": "Inquiries in Last 6 Months",
-  "delinq.2yrs": "Delinquencies in Last 2 Years",
-  "pub.rec": "Public Record Bankruptcies",
-};
-
-// Options for the 'purpose' dropdown
+// Options for the loan purpose dropdown
 export const purposeOptions = [
   "credit_card",
   "debt_consolidation",
@@ -61,41 +42,59 @@ export const purposeOptions = [
   "all_other",
 ];
 
-// NEW: Options for the 'credit.policy' dropdown
+// Options for credit policy approval (for the selector)
 export const creditPolicyOptions = [
-  { label: "Meets the policy", value: 1 },
-  { label: "Does not meet the policy", value: 0 },
+  { value: 1, label: "Meets Credit Policy" },
+  { value: 0, label: "Does Not Meet Policy" },
 ];
 
+// Mapping of form field names to user-friendly labels
+export const labelMap = {
+  "credit.policy": "CREDIT POLICY APPROVAL",
+  purpose: "LOAN PURPOSE",
+  "int.rate": "INTEREST RATE (%)",
+  installment: "MONTHLY INSTALLMENT (₹)",
+  "log.annual.inc": "LOG OF ANNUAL INCOME",
+  dti: "DEBT TO INCOME RATIO (%)",
+  fico: "FICO SCORE",
+  "days.with.cr.line": "DAYS WITH CREDIT LINE",
+  "revol.bal": "REVOLVING BALANCE (₹)",
+  "revol.util": "REVOLVING CREDIT UTILIZATION (%)",
+  "inq.last.6mths": "INQUIRIES IN LAST 6 MONTHS",
+  "delinq.2yrs": "DELINQUENCIES IN LAST 2 YEARS",
+  "pub.rec": "PUBLIC RECORDS",
+};
 
-// Function to get appropriate icon for each field
+// Function to get the appropriate Heroicon component for each input field
 export const getIconForField = (fieldName) => {
   switch (fieldName) {
     case "credit.policy":
       return ShieldCheckIcon;
-    case "int.rate":
+    case "purpose":
       return TagIcon;
+    case "int.rate":
+      return ReceiptPercentIcon;
     case "installment":
-      return BanknotesIcon;
-    case "log.annual.inc":
       return CurrencyDollarIcon;
+    case "log.annual.inc":
+      return BanknotesIcon;
     case "dti":
       return ScaleIcon;
     case "fico":
-      return CreditCardIcon;
+      return ChartBarIcon;
     case "days.with.cr.line":
       return CalendarDaysIcon;
     case "revol.bal":
-      return ChartBarSquareIcon;
+      return GlobeAltIcon;
     case "revol.util":
-      return ArrowPathIcon;
+      return ClockIcon; 
     case "inq.last.6mths":
-      return DocumentMagnifyingGlassIcon;
+      return MagnifyingGlassIcon;
     case "delinq.2yrs":
-      return ClockIcon;
+      return ClipboardDocumentListIcon;
     case "pub.rec":
-      return NewspaperIcon;
+      return BuildingLibraryIcon
     default:
-      return GlobeAltIcon; // Default icon
+      return null;
   }
 };

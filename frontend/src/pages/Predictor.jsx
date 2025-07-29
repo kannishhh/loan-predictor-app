@@ -6,12 +6,14 @@ import {
   ArrowLeftStartOnRectangleIcon,
   RocketLaunchIcon,
   ClockIcon,
-  GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 
-import PredictorInputs from "../components/predictor/PredictorInputs";
+// Importing sub-components
 import PredictorSelector from "../components/predictor/PredictorSelector";
+import PredictorInputs from "../components/predictor/PredictorInputs";
 import PredictionResult from "../components/predictor/PredictionResult";
+
+// Importing constants
 import {
   initialForm,
   purposeOptions,
@@ -29,16 +31,22 @@ const Predictor = ({ onLogout }) => {
   const pdfRef = useRef();
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    setForm({
-      ...form,
-      [name]:
-        type === "number"
-          ? parseFloat(value)
-          : name === "purpose"
-          ? value.toLowerCase().replace(" ", "_")
-          : value,
-    });
+    const { name, value } = e.target;
+
+    let processedValue;
+
+    if (name === "credit.policy") {
+      processedValue = parseInt(value, 10);
+    } else if (name === "purpose") {
+      processedValue = value.toLowerCase().replace(/ /g, "_");
+    } else {
+      processedValue = value === "" ? "" : parseFloat(value);
+    }
+
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: processedValue,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -79,7 +87,7 @@ const Predictor = ({ onLogout }) => {
           ...data,
           timestamp: new Date().toLocaleString(),
           input: form,
-          email: userEmail, 
+          email: userEmail,
         };
         const oldHistory = JSON.parse(localStorage.getItem("history") || "[]");
         const newHistory = [entry, ...oldHistory];
@@ -100,7 +108,6 @@ const Predictor = ({ onLogout }) => {
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6 flex flex-col items-center">
       <div className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:shadow-xl">
-       
         <div className="flex justify-between items-center mb-10 border-b border-gray-200 pb-6">
           <h1 className="text-4xl font-extrabold text-gray-700 tracking-tight flex items-center">
             <ChartPieIcon className="h-10 w-10 text-purple-500 mr-3" />
@@ -109,8 +116,8 @@ const Predictor = ({ onLogout }) => {
           <button
             onClick={() => {
               localStorage.removeItem("isLoggedIn");
-              localStorage.removeItem("userToken"); 
-              localStorage.removeItem("userEmail"); 
+              localStorage.removeItem("userToken");
+              localStorage.removeItem("userEmail");
               onLogout();
             }}
             className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
@@ -120,7 +127,6 @@ const Predictor = ({ onLogout }) => {
           </button>
         </div>
 
-        
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
@@ -141,7 +147,7 @@ const Predictor = ({ onLogout }) => {
             value={form.purpose}
             onChange={handleChange}
             options={purposeOptions}
-            IconComponent={getIconForField("pu")}
+            IconComponent={getIconForField("purpose")}
             capitalizeOptions={true}
           />
 
@@ -162,6 +168,7 @@ const Predictor = ({ onLogout }) => {
             ))}
 
           <div className="md:col-span-2 text-center mt-6">
+            {" "}
             <button
               type="submit"
               className="flex items-center justify-center space-x-3 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
@@ -191,8 +198,8 @@ const Predictor = ({ onLogout }) => {
           />
         )}
       </div>
-
       <div className="mt-12 text-center">
+        {" "}
         <Link
           to="/history"
           className="inline-flex items-center space-x-2 text-purple-500 hover:text-purple-600 font-medium px-6 py-3 rounded-lg border-2 border-purple-500 hover:border-purple-600 transition duration-300 ease-in-out shadow-sm hover:shadow-md"

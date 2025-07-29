@@ -4,32 +4,29 @@ const PredictorInputs = ({
   value,
   onChange,
   IconComponent,
-  required = true,
+  type = "text",
+  required = false,
   step = "any",
 }) => {
   return (
     <div>
       <label
         htmlFor={name}
-        className="block text-gray-800 text-sm font-semibold mb-2"
+        className="block text-gray-700 text-sm font-bold mb-2 items-center space-x-2"
       >
-        {label}
+        {IconComponent && <IconComponent className="h-5 w-5 text-gray-500" />}
+        <span>{label}</span>
       </label>
-      <div className="relative">
-        {IconComponent && (
-          <IconComponent className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
-        )}
-        <input
-          type="number"
-          id={name}
-          name={name}
-          value={value}
-          onChange={onChange}
-          className="w-full pl-10 pr-4 py-2 border border-gray-500 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ease-in-out"
-          required={required}
-          step={step}
-        />
-      </div>
+      <input
+        type={type}
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-150 ease-in-out"
+        required={required}
+        step={step} 
+      />
     </div>
   );
 };

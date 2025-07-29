@@ -166,7 +166,7 @@ const History = () => {
                     className="hover:bg-purple-500/5 transition-colors duration-150 ease-in-out"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {h.timestamp}
+                      {new Date(h.timestamp).toLocaleString()}
                     </td>
                     <td
                       className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${
