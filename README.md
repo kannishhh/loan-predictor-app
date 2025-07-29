@@ -110,7 +110,7 @@ The backend server will typically run on `http://localhost:5000.`
 
 ### 🌐 Frontend (React + Vite)
 
-1. Navigate to the frontend directory:
+1. Navigate to the `frontend` directory:
 
 ```bash
 cd frontend
@@ -134,7 +134,7 @@ The frontend application will typically open in your browser at `http://localhos
 
 ## 📜 License
 
-This project is for educational purposes only.
+This project is for educational purposes only.\
 Feel free to fork, modify, and build on it as you wish! 🙌
 
 ---
