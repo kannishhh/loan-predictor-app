@@ -12,6 +12,9 @@ A full-stack Loan Prediction web application built with **React(Vite + Tailwind 
 - 🎨 Tailwind CSS
 - 🧠 React Hooks & Routing
 - 📄 html2pdf.js for PDF generation
+- 📊 Chart.js & react-chartjs-2 for data visualization
+- ✨ Heroicons for modern UI icons
+- 🔥 Firebase (Authentication, Firestore Database) for user management and centralized data storage (upcoming)
 
 ### 🔙 Backend:
 
@@ -23,20 +26,22 @@ A full-stack Loan Prediction web application built with **React(Vite + Tailwind 
 
 ## ✅ Current Features
 
-- 🔐 **Users Auth UI** (frontend only, full auth coming soon)
-- 📝 **Loan Prediction Form** with labeled inputs
-- 📊 **Displays Prediction & Confidence**
-- 📂 **History Page** with saved prediction
-- 📄 **Export Prediction to PDF**
-- 🌓 **Dark Mode UI**
+- 🔐 **User Authentication:** Secure login/logout flow with Firebase Authentication (supports anonymous and custom token authentication).
+- 📝 **Loan Prediction Form:** Intuitive form with labeled inputs and clear guidance.
+- 📊 **Enhanced Prediction Display:** Visually appealing results with a Doughnut Chart showing prediction confidence.
+- 📂 **Personal Prediction History:** Users can view their past predictions saved locally.
+- 📄 **Export Prediction to PDF:** Download individual prediction results as a PDF report.
+- 🖥️ **Admin Dashboard:** A dedicated view for administrators to see all predictions made by all users in real-time.
+- ☁️ **Centralized Prediction Storage (Firestore):** All user predictions are securely stored in a Firebase Firestore database.(upcoming)
+- 🌓 **Dark Mode UI** (in future)
 
 ---
 
 ## 🧠 Machine Leraning
 
-- Model trained using public loan dataset (e.g. Kaggle Loan Prediction)
-- Preprocessing and training down using Pandas & Scikit-Learn
-- Prediction served via Flask API
+- Model trained using public loan dataset (e.g. Kaggle Loan Prediction).
+- Data Preprocessing and model training performed using Pandas & Scikit-Learn.
+- Prediction served via a Flask API endpoint.
 
 ---
 
@@ -56,6 +61,13 @@ root/
 ├── frontend/ # Vite + React Frontend
 │ ├── src/
 │ │ ├── components/ # Reusable UI components
+│ │ │ ├── predictor/ # Components specific to the predictor page
+│ │ │ │    ├── PredictionResult.jsx
+│ │ │ │    ├── PredictorInputs.jsx
+│ │ │ │    └── PredictorSelector.jsx
+│ │ │ └── History.jsx
+│ │ ├── constants/ # Global constants like form initial state, labels, icons
+│ │ │ └── predictorConstants.js
 │ │ ├── pages/ # Main pages (Home, Predictor, History)
 │ │ └── App.jsx
 │ ├── public/
@@ -72,31 +84,65 @@ root/
 
 ## 🚀 How to Run Locally
 
+To run this application, you'll need to set up both the Flask backend and the React frontend, and crucially, configure your Firebase project.
+
 ### 🔙 Backend (Flask)
+
+1. Navigate to the `backend` directory:
+
 ```bash
 cd backend
+```
+
+2. Install the required Python packages:
+
+```bash
 pip install -r requirements.txt
+```
+
+3. Run the Flask application:
+
+```bash
 python app.py
 ```
 
+The backend server will typically run on `http://localhost:5000.`
+
 ### 🌐 Frontend (React + Vite)
+
+1. Navigate to the frontend directory:
+
 ```bash
 cd frontend
+```
+
+2. Install the npm dependencies:
+
+```bash
 npm install
+```
+
+3. Start the development server:
+
+```bash
 npm run dev
 ```
+
+The frontend application will typically open in your browser at `http://localhost:5173` (or another port).
 
 ---
 
 ## 📜 License
+
 This project is for educational purposes only.
 Feel free to fork, modify, and build on it as you wish! 🙌
 
 ---
 
 ## 🙋‍♂️ Author
+
 Made with ❤️ by Kanish Kainth
+
 - 🔗 GitHub: kannishhh
 - 📧 Email: knshkainth2002@gmail.com
 - 💼 Open to internships and freelance opportunities!
-
