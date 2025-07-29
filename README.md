@@ -1,6 +1,6 @@
 # 🏦 Loan Eligibility Prediction App
 
-A full-stack Loan Prediction web application built with **React(Vite + Tailwind CSS)** for the frontend and **Flask** for the backend. It allows users to check loan approval eligibility using a machine learning, view their prediction history, and download results as a PDF.
+A full-stack Loan Prediction web application built with **React(Vite + Tailwind CSS)** for the frontend and **Flask** for the backend. It allows users to check loan approval eligibility using a machine learning model, view their prediction history, download results as a PDF, and now features centralized prediction storage with an admin dashboard.
 
 ---
 
