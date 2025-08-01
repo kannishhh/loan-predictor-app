@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 # Load the dataset
 try:
-    df = pd.read_csv("loan_data.csv")
+    df = pd.read_csv("backend/loan_data.csv")
 except FileNotFoundError:
     print("Error: loan_data.csv not found! Please place it in the project folder.")
     exit(1)
@@ -33,8 +33,8 @@ numerical_cols = ['int.rate', 'installment', 'log.annual.inc', 'dti', 'fico',
 X_train[numerical_cols] = scaler.fit_transform(X_train[numerical_cols])
 
 # Save the model, scaler, and label encoder
-joblib.dump(rf_clf, 'random_forest_model.pkl')
-joblib.dump(scaler, 'scaler.pkl')
-joblib.dump(le, 'label_encoder.pkl')
+joblib.dump(rf_clf, 'backend/models/random_forest_model.pkl')
+joblib.dump(scaler, 'backend/models/scaler.pkl')
+joblib.dump(le, 'backend/models/label_encoder.pkl')
 
 print("Success: random_forest_model.pkl, scaler.pkl, and label_encoder.pkl have been generated!")

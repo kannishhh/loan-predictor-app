@@ -107,24 +107,18 @@ const AdminDashboard = ({ onAdminLogout }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6 flex flex-col items-center">
-      <div className="w-full max-w-6xl bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:shadow-xl">
-        
+      <div className="w-full max-w-6xl bg-white p-8 rounded-xl shadow-lg">
         <div className="flex justify-between items-center mb-10 border-b border-gray-200 pb-6">
           <h1 className="text-4xl font-extrabold text-gray-700 tracking-tight flex items-center">
-            <UserGroupIcon className="h-10 w-10 text-purple-500 mr-3" />
+            <ChartPieIcon className="h-10 w-10 text-purple-500 mr-3" />
             Admin Dashboard
           </h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-          >
-            <ArrowRightEndOnRectangleIcon className="h-5 w-5" />
-            <span>Logout</span>
-          </button>
         </div>
+        <p className="text-gray-600 text-lg mb-8">
+          Welcome to the admin dashboard. Here's a summary of recent activity.
+        </p>
 
-       
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-4">
         
           <div className="bg-gray-50 p-6 rounded-lg shadow-md border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-700 mb-4 flex items-center">

@@ -1,4 +1,3 @@
-# app.py
 import json
 import os
 from flask import Flask, request, jsonify, render_template
@@ -165,12 +164,17 @@ def admin_login():
 
 # --- Prediction Route ---
 @app.route('/predict', methods=['POST'])
+@jwt_required()
 def predict():
     if model is None or scaler is None or label_encoder is None:
         return jsonify({'error': 'Model not loaded. Server configuration error.'}), 500
 
     try:
         data = request.get_json()
+        current_user_email = get_jwt_identity()
+
+        if not current_user_email:
+            return jsonify({'error': 'Authentication required to make a prediction.'}), 401
 
         # Validate all required columns are present
         for col in columns:
@@ -184,11 +188,17 @@ def predict():
                 try:
                     input_data[col] = label_encoder.transform([data[col]])[0]
                 except ValueError:
+                    # If purpose is not in the encoder, you might want to handle it gracefully
+                    # For now, we return an error, which is reasonable.
                     return jsonify({'error': f"Invalid purpose: {data[col]}. Must be one of {list(label_encoder.classes_)}"}), 400
             else:
                 try:
-                    input_data[col] = float(data[col])
-                except ValueError:
+                    # Ensure the value is not None or empty string before converting to float
+                    value = data.get(col)
+                    if value is None or value == '':
+                         return jsonify({'error': f"Field '{col}' cannot be empty."}), 400
+                    input_data[col] = float(value)
+                except (ValueError, TypeError):
                     return jsonify({'error': f"Invalid number format for field: {col}"}), 400
 
         df = pd.DataFrame([input_data], columns=columns)
@@ -199,20 +209,18 @@ def predict():
         df[numerical_cols] = scaler.transform(df[numerical_cols])
 
         prediction = model.predict(df)[0]
-        # Ensure probability index matches your model's output for 'repaid' vs 'non-repaid'
-        # Assuming 0 is 'Repaid' and 1 is 'Non-Repaid' based on your frontend logic
-        probability_non_repaid = model.predict_proba(df)[0][1] # Probability of class 1 (non-repaid)
+        probability_non_repaid = model.predict_proba(df)[0][1]
 
         result = 'Loan Likely to be Repaid' if prediction == 0 else 'Loan at Risk of Non-Repayment'
-        confidence = f"{probability_non_repaid * 100:.2f}% chance of non-repayment" if prediction == 1 else f"{(1 - probability_non_repaid) * 100:.2f}% chance of repayment"
+        confidence_value = (1 - probability_non_repaid) * 100 if prediction == 0 else probability_non_repaid * 100
+        confidence = f"{confidence_value:.2f}%"
 
-        user_email = request.headers.get("X-User-Email", "guest")
         entry = {
-            "email": user_email,
-            "input": data, # Store original input for history
+            "email": current_user_email,
+            "input": data,
             "result": result,
             "confidence": confidence,
-            "timestamp": datetime.now().isoformat() # Use isoformat for consistent date strings
+            "timestamp": datetime.now().isoformat()
         }
         history = load_history()
         history.append(entry)
@@ -222,7 +230,8 @@ def predict():
 
     except Exception as e:
         print(f"Prediction error: {e}")
-        return jsonify({'error': str(e)}), 400
+        # Return a more generic error to the user for security
+        return jsonify({'error': 'An unexpected error occurred during prediction.'}), 500
 
 # --- History Routes ---
 @app.route("/history", methods=["GET", "DELETE"])

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import {
@@ -8,10 +8,13 @@ import {
   ClockIcon,
 } from "@heroicons/react/24/outline";
 
+// Importing our shared context
+import { PredictionContext } from "../App";
+
 // Importing sub-components
+import PredictionResult from "../components/predictor/PredictionResult";
 import PredictorSelector from "../components/predictor/PredictorSelector";
 import PredictorInputs from "../components/predictor/PredictorInputs";
-import PredictionResult from "../components/predictor/PredictionResult";
 
 // Importing constants
 import {
@@ -23,37 +26,43 @@ import {
 } from "../constants/predictorConstants";
 
 const Predictor = ({ onLogout }) => {
+  // Use the useContext hook to get the function for adding new predictions
+  const { handleNewPrediction } = useContext(PredictionContext);
+
+  // State for form data, prediction result, loading indicators
   const [form, setForm] = useState(initialForm);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
 
+  // Ref for the PDF generation
   const pdfRef = useRef();
 
+  // Handles changes in form input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    let processedValue;
+    let processedValue = value;
 
-    if (name === "credit.policy") {
-      processedValue = parseInt(value, 10);
-    } else if (name === "purpose") {
-      processedValue = value.toLowerCase().replace(/ /g, "_");
-    } else {
+    if (Object.keys(initialForm).includes(name) && name !== "purpose") {
       processedValue = value === "" ? "" : parseFloat(value);
+    } else if (name === "purpose") {
+      processedValue = value.toLowerCase().replace(" ", "_");
     }
 
-    setForm((prevForm) => ({
-      ...prevForm,
+    setForm({
+      ...form,
       [name]: processedValue,
-    }));
+    });
   };
 
+  // Handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setResult(null);
 
+    // Frontend validation
     for (const key in form) {
       const value = form[key];
       if (
@@ -67,14 +76,22 @@ const Predictor = ({ onLogout }) => {
       }
     }
 
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      toast.error("You must be logged in to make a prediction.");
+      setLoading(false);
+      return;
+    }
+
     const userEmail = localStorage.getItem("userEmail") || "guest";
+    const userId = crypto.randomUUID();
 
     try {
       const response = await fetch("http://localhost:5000/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-Email": userEmail,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(form),
       });
@@ -88,10 +105,19 @@ const Predictor = ({ onLogout }) => {
           timestamp: new Date().toLocaleString(),
           input: form,
           email: userEmail,
+          userId: userId,
+          id: Date.now().toString(), // Unique ID for this prediction entry
         };
+
+        // Call the context function to add the new prediction
+        handleNewPrediction(entry);
+        toast.success("Prediction saved to session memory!");
+
+        // Save to Local Storage (for individual user history)
         const oldHistory = JSON.parse(localStorage.getItem("history") || "[]");
         const newHistory = [entry, ...oldHistory];
         localStorage.setItem("history", JSON.stringify(newHistory));
+
       } else {
         setResult({ error: data.error || "Prediction failed." });
         toast.error(data.error || "Prediction failed.");
@@ -108,6 +134,7 @@ const Predictor = ({ onLogout }) => {
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6 flex flex-col items-center">
       <div className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:shadow-xl">
+
         <div className="flex justify-between items-center mb-10 border-b border-gray-200 pb-6">
           <h1 className="text-4xl font-extrabold text-gray-700 tracking-tight flex items-center">
             <ChartPieIcon className="h-10 w-10 text-purple-500 mr-3" />
@@ -168,7 +195,6 @@ const Predictor = ({ onLogout }) => {
             ))}
 
           <div className="md:col-span-2 text-center mt-6">
-            {" "}
             <button
               type="submit"
               className="flex items-center justify-center space-x-3 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
@@ -198,8 +224,8 @@ const Predictor = ({ onLogout }) => {
           />
         )}
       </div>
+
       <div className="mt-12 text-center">
-        {" "}
         <Link
           to="/history"
           className="inline-flex items-center space-x-2 text-purple-500 hover:text-purple-600 font-medium px-6 py-3 rounded-lg border-2 border-purple-500 hover:border-purple-600 transition duration-300 ease-in-out shadow-sm hover:shadow-md"
