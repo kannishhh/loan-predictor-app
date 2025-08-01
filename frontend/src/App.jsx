@@ -88,7 +88,7 @@ function App() {
 
   return (
     <div>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} />
       {/* We wrap the entire app in the PredictionContext Provider */}
       <PredictionContext.Provider value={{ allPredictions, handleNewPrediction }}>
         <BrowserRouter>

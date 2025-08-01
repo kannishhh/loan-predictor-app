@@ -1,17 +1,22 @@
 import json
 import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import joblib
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta # Import datetime and timedelta
+from datetime import datetime, timedelta 
 
-# For password hashing (install: pip install Werkzeug)
+# For password hashing 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# For JWT (install: pip install Flask-JWT-Extended)
+# For JWT
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
+
+# For Google Login
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 # Import your existing blueprints (assuming they handle their own routes)
 from routes.admin_stats import admin_stats_bp
@@ -19,12 +24,16 @@ from routes.admin_feedback import feedback_bp
 from routes.admin_predictions import predictions_bp
 from routes.admin_users import admin_users
 
+
+
 app = Flask(__name__)
 CORS(app) # Enable CORS for all routes
 
+
+
 # --- JWT Configuration ---
-app.config["JWT_SECRET_KEY"] = "your_super_secret_jwt_key_here" # CHANGE THIS TO A STRONG, RANDOM KEY!
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1) # Token valid for 1 hour
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "your_super_secret_jwt_key_here")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
 
 # Register your blueprints
@@ -44,7 +53,7 @@ except FileNotFoundError as e:
     scaler = None
     label_encoder = None
 
-# Define feature columns (same as in the dataset, excluding 'not.fully.paid')
+# Define feature column
 columns = ['credit.policy', 'purpose', 'int.rate', 'installment', 'log.annual.inc',
            'dti', 'fico', 'days.with.cr.line', 'revol.bal', 'revol.util',
            'inq.last.6mths', 'delinq.2yrs', 'pub.rec']
@@ -53,7 +62,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 USER_FILE = os.path.join(BASE_DIR, 'data', 'users.json')
 HISTORY_FILE = os.path.join(BASE_DIR, 'data', 'history.json')
-LOGIN_HISTORY_FILE = os.path.join(BASE_DIR, 'data', 'login_history.json') # New file for login records
+LOGIN_HISTORY_FILE = os.path.join(BASE_DIR, 'data', 'login_history.json') 
+
+
+#---- .env ----------
+load_dotenv()
+
 
 # --- Helper Functions for JSON Files ---
 def load_json_file(filepath):
@@ -68,7 +82,7 @@ def load_json_file(filepath):
 
 def save_json_file(data, filepath):
     with open(filepath, "w") as f:
-        json.dump(data, f, indent=4) # Use indent for readability
+        json.dump(data, f, indent=4) 
 
 def load_users():
     return load_json_file(USER_FILE)
@@ -92,7 +106,7 @@ def save_login_history(login_history):
 def is_user_admin(email):
     users = load_users()
     user = next((u for u in users if u["email"] == email), None)
-    return user and user.get("is_admin", False) # Default to False if not set
+    return user and user.get("is_admin", False) 
 
 # --- Authentication Routes ---
 
@@ -110,14 +124,13 @@ def signup():
         return jsonify({"error": "User already exists"}), 400
 
     # IMPORTANT: Hash the password in a real application!
-    # hashed_password = generate_password_hash(password)
-    hashed_password = password # Placeholder for demo, REPLACE THIS!
+    hashed_password = generate_password_hash(password)
 
     users.append({
         "email": email,
         "password": hashed_password,
-        "is_admin": False, # New users are not admins by default
-        "created_at": datetime.now().isoformat() # Store creation timestamp
+        "is_admin": False,
+        "created_at": datetime.now().isoformat() 
     })
     save_users(users)
     return jsonify({"message": "Signup successful"}), 201
@@ -132,8 +145,7 @@ def login():
     user = next((u for u in users if u["email"] == email), None)
 
     # IMPORTANT: Check hashed password in a real application!
-    # if user and check_password_hash(user["password"], password):
-    if user and user["password"] == password: # Placeholder for demo, REPLACE THIS!
+    if user and check_password_hash(user.get("password", ""), password):
         # Record login event
         login_history = load_login_history()
         login_history.append({
@@ -149,18 +161,77 @@ def login():
 @app.route("/admin-login", methods=["POST"])
 def admin_login():
     data = request.get_json()
-    email = data.get("email") # Using 'email' for admin ID
+    email = data.get("email")
     password = data.get("password")
 
     users = load_users()
     admin_user = next((u for u in users if u["email"] == email and u.get("is_admin", False)), None)
 
-    # IMPORTANT: Check hashed password in a real application!
-    # if admin_user and check_password_hash(admin_user["password"], password):
-    if admin_user and admin_user["password"] == password: # Placeholder for demo, REPLACE THIS!
+    if not admin_user:
+        return jsonify({"error": "Invalid admin credentials"}), 401
+
+    stored_password = admin_user.get("password", "")
+
+    # Check for hashed password first, then fall back to plain text for legacy admin
+    if check_password_hash(stored_password, password):
         access_token = create_access_token(identity=email)
         return jsonify({"message": "Admin login successful", "access_token": access_token}), 200
+    
+    # Fallback for plain text password
+    if stored_password == password:
+        # Upgrade the password to a hash for future logins
+        admin_user["password"] = generate_password_hash(password)
+        save_users(users)
+        
+        access_token = create_access_token(identity=email)
+        return jsonify({"message": "Admin login successful", "access_token": access_token}), 200
+
     return jsonify({"error": "Invalid admin credentials"}), 401
+
+@app.route("/google-login", methods=["POST"])
+def google_login():
+    data = request.get_json()
+    token = data.get("token")
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+
+    if not token:
+        return jsonify({"error": "Token is missing"}), 400
+
+    try:
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), client_id)
+        email = idinfo["email"]
+        
+        users = load_users()
+        user = next((u for u in users if u["email"] == email), None)
+
+        if not user:
+            # If user doesn't exist, create a new one
+            user = {
+                "email": email,
+                "password": "", 
+                "is_admin": False,
+                "created_at": datetime.now().isoformat()
+            }
+            users.append(user)
+            save_users(users)
+
+        # Record login event
+        login_history = load_login_history()
+        login_history.append({
+            "email": email,
+            "timestamp": datetime.now().isoformat()
+        })
+        save_login_history(login_history)
+
+        access_token = create_access_token(identity=email)
+        return jsonify({"message": "Login successful", "access_token": access_token, "email": email}), 200
+
+    except ValueError:
+        # Invalid token
+        return jsonify({"error": "Invalid Google token"}), 401
+    except Exception as e:
+        print(f"Google login error: {e}")
+        return jsonify({"error": "An unexpected error occurred during Google login."}), 500
 
 # --- Prediction Route ---
 @app.route('/predict', methods=['POST'])
@@ -184,12 +255,11 @@ def predict():
         input_data = {}
         for col in columns:
             if col == 'purpose':
-                # Handle cases where purpose might not be in the original encoder classes
+               
                 try:
                     input_data[col] = label_encoder.transform([data[col]])[0]
                 except ValueError:
-                    # If purpose is not in the encoder, you might want to handle it gracefully
-                    # For now, we return an error, which is reasonable.
+                    
                     return jsonify({'error': f"Invalid purpose: {data[col]}. Must be one of {list(label_encoder.classes_)}"}), 400
             else:
                 try:
@@ -230,19 +300,17 @@ def predict():
 
     except Exception as e:
         print(f"Prediction error: {e}")
-        # Return a more generic error to the user for security
+       
         return jsonify({'error': 'An unexpected error occurred during prediction.'}), 500
 
 # --- History Routes ---
 @app.route("/history", methods=["GET", "DELETE"])
-@jwt_required(optional=True) # Allow access without JWT, but get identity if present
+@jwt_required(optional=True) 
 def history():
-    current_user_email = get_jwt_identity() # Get email from JWT if logged in
-    email_param = request.args.get("email") # Get email from query param
+    current_user_email = get_jwt_identity() 
+    email_param = request.args.get("email") 
 
-    # Prioritize JWT identity if present, otherwise use query param
-    # This is important if you want to restrict history to logged-in users only
-    # For now, we'll allow query param for simplicity, but a real app would restrict.
+    
     target_email = current_user_email if current_user_email else email_param
 
     if not target_email:
@@ -251,11 +319,11 @@ def history():
     if request.method == "GET":
         history_data = load_history()
         user_history = [h for h in history_data if h.get("email") == target_email]
-        # Sort history by timestamp (newest first)
+     
         user_history.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
         return jsonify(user_history)
     elif request.method == "DELETE":
-        # Ensure only the owner can delete their history (if JWT is used)
+        
         if current_user_email and current_user_email != target_email:
              return jsonify({"error": "Unauthorized to clear this history"}), 403
 
@@ -275,7 +343,7 @@ def get_recent_signups():
 
     limit = request.args.get('limit', 5, type=int)
     users = load_users()
-    # Filter out admins from signups, sort by created_at (newest first)
+    
     recent_signups = sorted(
         [u for u in users if not u.get("is_admin", False)],
         key=lambda x: x.get("created_at", ""),
@@ -292,7 +360,7 @@ def get_recent_logins():
 
     limit = request.args.get('limit', 5, type=int)
     login_history = load_login_history()
-    # Sort by timestamp (newest first)
+   
     recent_logins = sorted(
         login_history,
         key=lambda x: x.get("timestamp", ""),
@@ -302,14 +370,14 @@ def get_recent_logins():
 
 @app.route('/admin/dashboard/recent-predictions', methods=['GET'])
 @jwt_required()
-def get_recent_predictions_admin(): # Renamed to avoid conflict with blueprint route if any
+def get_recent_predictions_admin(): 
     current_user_email = get_jwt_identity()
     if not is_user_admin(current_user_email):
         return jsonify({"message": "Access Forbidden: Not an admin"}), 403
 
     limit = request.args.get('limit', 5, type=int)
     history_data = load_history()
-    # Sort by timestamp (newest first)
+    
     recent_predictions = sorted(
         history_data,
         key=lambda x: x.get("timestamp", ""),
@@ -364,20 +432,20 @@ def get_recent_predictions_admin(): # Renamed to avoid conflict with blueprint r
 
 
 if __name__ == '__main__':
-    # Ensure data directories and files exist on startup
+
     os.makedirs(os.path.join(BASE_DIR, 'data'), exist_ok=True)
     for f_path in [USER_FILE, HISTORY_FILE, LOGIN_HISTORY_FILE]:
         if not os.path.exists(f_path):
             with open(f_path, 'w') as f:
-                json.dump([], f) # Initialize with empty list
+                json.dump([], f) 
 
-    # IMPORTANT: Create an initial admin user if users.json is empty
     users = load_users()
     if not any(u.get("is_admin", False) for u in users):
         print("No admin user found. Creating a default admin user.")
+        hashed_password = generate_password_hash("adminpass")
         users.append({
             "email": "admin@example.com",
-            "password": "adminpass", # REPLACE THIS WITH A HASHED PASSWORD!
+            "password": hashed_password,
             "is_admin": True,
             "created_at": datetime.now().isoformat()
         })

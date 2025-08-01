@@ -7,6 +7,7 @@ import {
   LockClosedIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = ({ setIsLoggedIn }) => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -46,6 +47,32 @@ const Login = ({ setIsLoggedIn }) => {
       }
     } catch (error) {
       console.error("Login server error:", error);
+      toast.error("Server error. Try again.");
+    }
+  };
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      const res = await fetch("http://localhost:5000/google-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem("userToken", data.access_token);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", data.email);
+        setIsLoggedIn(true);
+        toast.success("Login successful!");
+        navigate("/predict");
+      } else {
+        toast.error(data.error || "Google login failed");
+      }
+    } catch (error) {
+      console.error("Google login server error:", error);
       toast.error("Server error. Try again.");
     }
   };
@@ -153,6 +180,27 @@ const Login = ({ setIsLoggedIn }) => {
               Signup
             </Link>
           </p>
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => {
+                  toast.error("Google Login Failed");
+                }}
+              />
+            </div>
+          </div>
           <p className="text-center text-sm text-gray-500 mt-2">
             Are you an admin?{" "}
             <Link
