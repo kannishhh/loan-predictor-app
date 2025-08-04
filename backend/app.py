@@ -17,6 +17,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 # For Google Login
 from google.oauth2 import id_token
 from google.auth.transport import requests
+import requests as req
 
 # Import your existing blueprints (assuming they handle their own routes)
 from routes.admin_stats import admin_stats_bp
@@ -187,6 +188,67 @@ def admin_login():
         return jsonify({"message": "Admin login successful", "access_token": access_token}), 200
 
     return jsonify({"error": "Invalid admin credentials"}), 401
+
+@app.route("/github/callback", methods=["POST"])
+def github_callback():
+    data = request.get_json()
+    code = data.get("code")
+
+    if not code:
+        return jsonify({"error": "Authorization code is missing"}), 400
+
+    client_id = os.getenv("GITHUB_CLIENT_ID")
+    client_secret = os.getenv("GITHUB_CLIENT_SECRET")
+
+    token_url = "https://github.com/login/oauth/access_token"
+    token_params = {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "code": code,
+    }
+    headers = {"Accept": "application/json"}
+    token_res = req.post(token_url, params=token_params, headers=headers)
+    token_data = token_res.json()
+
+    if "error" in token_data:
+        return jsonify({"error": token_data["error_description"]}), 400
+
+    access_token = token_data.get("access_token")
+
+    user_url = "https://api.github.com/user/emails"
+    user_headers = {"Authorization": f"token {access_token}"}
+    user_res = req.get(user_url, headers=user_headers)
+    user_data = user_res.json()
+
+    primary_email = next((email["email"] for email in user_data if email["primary"]), None)
+
+    if not primary_email:
+        return jsonify({"error": "Could not retrieve primary email from GitHub"}), 400
+
+    users = load_users()
+    user = next((u for u in users if u["email"] == primary_email), None)
+
+    if not user:
+        # If user doesn't exist, create a new one
+        user = {
+            "email": primary_email,
+            "password": "",  
+            "is_admin": False,
+            "created_at": datetime.now().isoformat()
+        }
+        users.append(user)
+        save_users(users)
+
+    # Record login event
+    login_history = load_login_history()
+    login_history.append({
+        "email": primary_email,
+        "timestamp": datetime.now().isoformat()
+    })
+    save_login_history(login_history)
+
+    jwt_token = create_access_token(identity=primary_email)
+    return jsonify({"message": "Login successful", "access_token": jwt_token, "email": primary_email}), 200
 
 @app.route("/google-login", methods=["POST"])
 def google_login():

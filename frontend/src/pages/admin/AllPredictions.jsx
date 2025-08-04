@@ -6,7 +6,9 @@ import {
   AdjustmentsHorizontalIcon,
   ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
-import { PredictionContext } from "../../App";
+
+// Importing our shared context
+import { PredictionContext } from "../../context/PredictionContext";
 
 const AllPredictions = () => {
   const { allPredictions } = useContext(PredictionContext);

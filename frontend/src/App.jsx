@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import toast from "react-hot-toast";
 
@@ -14,9 +14,8 @@ import AllPredictions from "./pages/admin/AllPredictions";
 import AdminFeedback from "./pages/admin/AdminFeedback";  
 import ManageUsers from "./pages/admin/ManageUsers";
 import AdminLayout from "./pages/admin/AdminLayout";
-
-// --- Create a Prediction Context ---
-export const PredictionContext = createContext();
+import GithubCallback from "./pages/GithubCallback";
+import { PredictionContext } from "./context/PredictionContext";
 
 // --- ProtectedAdminRoute Component ---
 const ProtectedAdminRoute = ({ children }) => {
@@ -99,7 +98,8 @@ function App() {
               path="/login"
               element={<Login setIsLoggedIn={setIsLoggedIn} />}
             />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/signup" element={<Signup setIsLoggedIn={setIsLoggedIn} />} />
+            <Route path="/github/callback" element={<GithubCallback setIsLoggedIn={setIsLoggedIn} />} />
 
             <Route
               path="/predict"

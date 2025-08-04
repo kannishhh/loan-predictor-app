@@ -670,5 +670,26 @@
         "result": "Loan Likely to be Repaid",
         "confidence": "65.50%",
         "timestamp": "2025-07-31T23:04:27.018704"
+    },
+    {
+        "email": "test@demo.com",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "credit_card",
+            "int.rate": 10,
+            "installment": 10000,
+            "log.annual.inc": 13,
+            "dti": 8.5,
+            "fico": 840,
+            "days.with.cr.line": 20000,
+            "revol.bal": 2842600,
+            "revol.util": 2530,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 0,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": "57.83%",
+        "timestamp": "2025-08-02T15:22:35.531884"
     }
 ]

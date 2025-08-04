@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 // Importing our shared context
-import { PredictionContext } from "../App";
+import { PredictionContext } from "../context/PredictionContext";
 
 // Importing sub-components
 import PredictionResult from "../components/predictor/PredictionResult";
