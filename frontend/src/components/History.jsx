@@ -134,7 +134,7 @@ const History = () => {
                   Result
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                  Confidence
+                  Confidence 
                 </th>
               </tr>
             </thead>
@@ -178,7 +178,11 @@ const History = () => {
                       {h.result}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {h.confidence}
+                      {h.confidence &&
+                        !isNaN((h.confidence)) &&
+                        `${(parseFloat(h.confidence) * 100).toFixed(2)}% chance of ${
+                          h.result?.includes("Repaid") ? "repayment" : "default"
+                        }`}
                     </td>
                   </tr>
                 ))

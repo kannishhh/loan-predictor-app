@@ -15,36 +15,38 @@ import { PredictionContext } from "../context/PredictionContext";
 import PredictionResult from "../components/predictor/PredictionResult";
 import PredictorSelector from "../components/predictor/PredictorSelector";
 import PredictorInputs from "../components/predictor/PredictorInputs";
+import PredictionChart from "../components/PredictionChart";
 
-// Importing constants
+// Importing constants, now including the new credit score options
 import {
   initialForm,
   purposeOptions,
   labelMap,
   getIconForField,
   creditPolicyOptions,
+  creditScoreOptions,
 } from "../constants/predictorConstants";
 
 const Predictor = ({ onLogout }) => {
-  // Use the useContext hook to get the function for adding new predictions
   const { handleNewPrediction } = useContext(PredictionContext);
 
-  // State for form data, prediction result, loading indicators
   const [form, setForm] = useState(initialForm);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  // Ref for the PDF generation
   const pdfRef = useRef();
 
-  // Handles changes in form input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     let processedValue = value;
 
-    if (Object.keys(initialForm).includes(name) && name !== "purpose") {
+    if (
+      Object.keys(initialForm).includes(name) &&
+      name !== "purpose" &&
+      name !== "credit_score_type"
+    ) {
       processedValue = value === "" ? "" : parseFloat(value);
     } else if (name === "purpose") {
       processedValue = value.toLowerCase().replace(" ", "_");
@@ -56,13 +58,11 @@ const Predictor = ({ onLogout }) => {
     });
   };
 
-  // Handles form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setResult(null);
 
-    // Frontend validation
     for (const key in form) {
       const value = form[key];
       if (
@@ -83,8 +83,8 @@ const Predictor = ({ onLogout }) => {
       return;
     }
 
-    const userEmail = localStorage.getItem("userEmail") || "guest";
-    const userId = crypto.randomUUID();
+    // const userEmail = localStorage.getItem("userEmail") || "guest";
+    // const userId = crypto.randomUUID();
 
     try {
       const response = await fetch("http://localhost:5000/predict", {
@@ -99,25 +99,22 @@ const Predictor = ({ onLogout }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setResult(data);
-        const entry = {
-          ...data,
-          timestamp: new Date().toLocaleString(),
-          input: form,
-          email: userEmail,
-          userId: userId,
-          id: Date.now().toString(), // Unique ID for this prediction entry
+        // The backend now returns the full entry object, including the correct timestamp and confidence value.
+        const entry = data; 
+        
+        // The result for display now needs to be formatted from the raw confidence
+        const displayResult = {
+          result: entry.result,
+          confidence: `${(entry.confidence * 100).toFixed(2)}%`
         };
+        setResult(displayResult);
 
-        // Call the context function to add the new prediction
+        // Use the consistent entry from the backend for context updates
         handleNewPrediction(entry);
-        toast.success("Prediction saved to session memory!");
+        toast.success("Prediction successful!");
 
-        // Save to Local Storage (for individual user history)
-        const oldHistory = JSON.parse(localStorage.getItem("history") || "[]");
-        const newHistory = [entry, ...oldHistory];
-        localStorage.setItem("history", JSON.stringify(newHistory));
-
+        // No longer need to manually manage local storage history here,
+        // as the History page fetches fresh data from the backend.
       } else {
         setResult({ error: data.error || "Prediction failed." });
         toast.error(data.error || "Prediction failed.");
@@ -134,7 +131,6 @@ const Predictor = ({ onLogout }) => {
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6 flex flex-col items-center">
       <div className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:shadow-xl">
-
         <div className="flex justify-between items-center mb-10 border-b border-gray-200 pb-6">
           <h1 className="text-4xl font-extrabold text-gray-700 tracking-tight flex items-center">
             <ChartPieIcon className="h-10 w-10 text-purple-500 mr-3" />
@@ -178,8 +174,26 @@ const Predictor = ({ onLogout }) => {
             capitalizeOptions={true}
           />
 
+          <PredictorSelector
+            name="credit_score_type"
+            label={labelMap["credit_score_type"]}
+            value={form.credit_score_type}
+            onChange={handleChange}
+            options={creditScoreOptions.map((option) => ({
+              value: option.value,
+              label: option.label,
+            }))}
+            IconComponent={getIconForField("credit_score_type")}
+            capitalizeOptions={false}
+          />
+
           {Object.keys(initialForm)
-            .filter((key) => key !== "purpose" && key !== "credit.policy")
+            .filter(
+              (key) =>
+                key !== "purpose" &&
+                key !== "credit.policy" &&
+                key !== "credit_score_type"
+            )
             .map((key) => (
               <PredictorInputs
                 key={key}
@@ -216,12 +230,21 @@ const Predictor = ({ onLogout }) => {
         </form>
 
         {result && (
-          <PredictionResult
-            result={result}
-            pdfRef={pdfRef}
-            pdfLoading={pdfLoading}
-            setPdfLoading={setPdfLoading}
-          />
+          <div className="mt-12 md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <PredictionResult
+                result={result}
+                pdfRef={pdfRef}
+                pdfLoading={pdfLoading}
+                setPdfLoading={setPdfLoading}
+              />
+
+              <PredictionChart
+                ficoScore={form.fico}
+                predictionResult={result.prediction}
+              />
+            </div>
+          </div>
         )}
       </div>
 

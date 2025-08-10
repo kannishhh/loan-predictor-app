@@ -40,7 +40,6 @@ const AdminLogin = ({ setIsAdminLoggedIn }) => {
           navigate("/admin");
         } else {
           toast.error("Login successful, but no token received.");
-          
         }
       } else {
         toast.error(data.error || "Invalid Credentials");

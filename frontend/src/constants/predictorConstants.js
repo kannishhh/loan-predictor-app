@@ -1,17 +1,18 @@
 import {
-  CurrencyDollarIcon,       
-  ScaleIcon,               
-  ClockIcon,                
-  BanknotesIcon,          
-  CalendarDaysIcon,        
-  ChartBarIcon,        
-  BuildingLibraryIcon,     
+  CurrencyDollarIcon,
+  ScaleIcon,
+  ClockIcon,
+  BanknotesIcon,
+  CalendarDaysIcon,
+  ChartBarIcon,
+  BuildingLibraryIcon,
   MagnifyingGlassIcon,
-  ReceiptPercentIcon,     
+  ReceiptPercentIcon,
   ClipboardDocumentListIcon,
-  ShieldCheckIcon,        
+  ShieldCheckIcon,
   TagIcon,
-  GlobeAltIcon,                  
+  GlobeAltIcon,
+  TrophyIcon,
 } from "@heroicons/react/24/outline";
 
 // Initial form state for the predictor
@@ -22,6 +23,7 @@ export const initialForm = {
   installment: "",
   "log.annual.inc": "",
   dti: "",
+  credit_score_type: "fico",
   fico: "",
   "days.with.cr.line": "",
   "revol.bal": "",
@@ -48,6 +50,12 @@ export const creditPolicyOptions = [
   { value: 0, label: "Does Not Meet Policy" },
 ];
 
+// New options for credit score types
+export const creditScoreOptions = [
+  { value: "fico", label: "FICO" },
+  { value: "cibil", label: "CIBIL" },
+];
+
 // Mapping of form field names to user-friendly labels
 export const labelMap = {
   "credit.policy": "CREDIT POLICY APPROVAL",
@@ -56,7 +64,8 @@ export const labelMap = {
   installment: "MONTHLY INSTALLMENT (₹)",
   "log.annual.inc": "LOG OF ANNUAL INCOME",
   dti: "DEBT TO INCOME RATIO (%)",
-  fico: "FICO SCORE",
+  credit_score_type: "CREDIT SCORE TYPE",
+  fico: "CREDIT SCORE", // Now a generic label
   "days.with.cr.line": "DAYS WITH CREDIT LINE",
   "revol.bal": "REVOLVING BALANCE (₹)",
   "revol.util": "REVOLVING CREDIT UTILIZATION (%)",
@@ -80,6 +89,8 @@ export const getIconForField = (fieldName) => {
       return BanknotesIcon;
     case "dti":
       return ScaleIcon;
+    case "credit_score_type":
+      return TrophyIcon;
     case "fico":
       return ChartBarIcon;
     case "days.with.cr.line":
@@ -87,7 +98,7 @@ export const getIconForField = (fieldName) => {
     case "revol.bal":
       return GlobeAltIcon;
     case "revol.util":
-      return ClockIcon; 
+      return ClockIcon;
     case "inq.last.6mths":
       return MagnifyingGlassIcon;
     case "delinq.2yrs":

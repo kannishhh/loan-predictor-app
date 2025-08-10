@@ -1,6 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import toast from "react-hot-toast";
+import { NavLink, Outlet } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
   ChartBarIcon,
@@ -41,16 +39,6 @@ SidebarItem.propTypes = {
 };
 
 const AdminLayout = ({ onAdminLogout }) => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
-      toast.error("Access Denied! Please log in.");
-      navigate("/admin-login", { replace: true });
-    }
-  }, [navigate]);
-
   return (
     <div className="flex bg-gray-50 min-h-screen">
       <aside className="w-64 bg-gray-900 text-gray-200 flex flex-col p-6 shadow-[0 6px 8px rgba(0, 0, 0, 0.07), 0 12px 20px rgba(0, 0, 0, 0.05)] h-screen sticky top-0">
@@ -67,11 +55,6 @@ const AdminLayout = ({ onAdminLogout }) => {
             icon={ClipboardDocumentListIcon}
             text="All Predictions"
             to="/admin/predictions"
-          />
-          <SidebarItem
-            icon={ChartBarIcon}
-            text="Model Stats"
-            to="/admin/stats"
           />
           <SidebarItem
             icon={ChatBubbleBottomCenterTextIcon}

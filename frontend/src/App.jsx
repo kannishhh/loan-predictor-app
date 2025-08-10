@@ -11,7 +11,7 @@ import History from "./components/History";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AllPredictions from "./pages/admin/AllPredictions";
-import AdminFeedback from "./pages/admin/AdminFeedback";  
+import AdminFeedback from "./pages/admin/AdminFeedback";
 import ManageUsers from "./pages/admin/ManageUsers";
 import AdminLayout from "./pages/admin/AdminLayout";
 import GithubCallback from "./pages/GithubCallback";
@@ -43,13 +43,39 @@ function App() {
     !!localStorage.getItem("adminToken")
   );
 
-  // New state to hold all predictions for the session
   const [allPredictions, setAllPredictions] = useState([]);
 
-  // Function to add a new prediction to our in-memory array
   const handleNewPrediction = (newPrediction) => {
-    setAllPredictions(prevPredictions => [newPrediction, ...prevPredictions]);
+    setAllPredictions((prevPredictions) => [newPrediction, ...prevPredictions]);
   };
+
+  useEffect(() => {
+    const fetchAllPredictions = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) return;
+
+        const res = await fetch("http://localhost:5000/api/admin/predictions", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setAllPredictions(data);
+        } else {
+          console.error("Failed to fetch all predictions");
+        }
+      } catch (error) {
+        console.error("Error fetching predictions:", error);
+      }
+    };
+
+    if (isAdminLoggedIn) {
+      fetchAllPredictions();
+    }
+  }, [isAdminLoggedIn]);
 
   useEffect(() => {
     const checkAuthStatus = () => {
@@ -88,8 +114,10 @@ function App() {
   return (
     <div>
       <Toaster position="top-right" reverseOrder={false} />
-      {/* We wrap the entire app in the PredictionContext Provider */}
-      <PredictionContext.Provider value={{ allPredictions, handleNewPrediction }}>
+
+      <PredictionContext.Provider
+        value={{ allPredictions, handleNewPrediction }}
+      >
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
@@ -98,14 +126,19 @@ function App() {
               path="/login"
               element={<Login setIsLoggedIn={setIsLoggedIn} />}
             />
-            <Route path="/signup" element={<Signup setIsLoggedIn={setIsLoggedIn} />} />
-            <Route path="/github/callback" element={<GithubCallback setIsLoggedIn={setIsLoggedIn} />} />
+            <Route
+              path="/signup"
+              element={<Signup setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/github/callback"
+              element={<GithubCallback setIsLoggedIn={setIsLoggedIn} />}
+            />
 
             <Route
               path="/predict"
               element={
                 <ProtectedUserRoute>
-                  {/* Predictor will now get the `handleNewPrediction` from context */}
                   <Predictor onLogout={handleLogout} />
                 </ProtectedUserRoute>
               }
@@ -136,7 +169,7 @@ function App() {
             >
               {/* Nested Admin Routes (will render inside AdminLayout's <Outlet />) */}
               <Route index element={<AdminDashboard />} />
-              {/* AllPredictions will now get the predictions from context */}
+
               <Route path="predictions" element={<AllPredictions />} />
               <Route path="feedback" element={<AdminFeedback />} />
               <Route path="users" element={<ManageUsers />} />

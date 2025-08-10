@@ -25,6 +25,9 @@ from routes.admin_feedback import feedback_bp
 from routes.admin_predictions import predictions_bp
 from routes.admin_users import admin_users
 
+# Import shared utilities
+from utils import is_user_admin, load_users
+
 
 
 app = Flask(__name__)
@@ -71,43 +74,39 @@ load_dotenv()
 
 
 # --- Helper Functions for JSON Files ---
-def load_json_file(filepath):
-    if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
-        return []
-    with open(filepath, "r") as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError:
-            print(f"Warning: {filepath} is empty or malformed. Returning empty list.")
-            return []
-
 def save_json_file(data, filepath):
     with open(filepath, "w") as f:
         json.dump(data, f, indent=4) 
-
-def load_users():
-    return load_json_file(USER_FILE)
 
 def save_users(users):
     save_json_file(users, USER_FILE)
 
 def load_history():
-    return load_json_file(HISTORY_FILE)
+    # This function remains here as it's not needed by the utils.
+    if not os.path.exists(HISTORY_FILE) or os.path.getsize(HISTORY_FILE) == 0:
+        return []
+    with open(HISTORY_FILE, "r") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            print(f"Warning: {HISTORY_FILE} is empty or malformed. Returning empty list.")
+            return []
 
 def save_history(history):
     save_json_file(history, HISTORY_FILE)
 
 def load_login_history():
-    return load_json_file(LOGIN_HISTORY_FILE)
+    if not os.path.exists(LOGIN_HISTORY_FILE) or os.path.getsize(LOGIN_HISTORY_FILE) == 0:
+        return []
+    with open(LOGIN_HISTORY_FILE, "r") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            print(f"Warning: {LOGIN_HISTORY_FILE} is empty or malformed. Returning empty list.")
+            return []
 
 def save_login_history(login_history):
     save_json_file(login_history, LOGIN_HISTORY_FILE)
-
-# --- Admin User Check (Crucial for Admin Routes) ---
-def is_user_admin(email):
-    users = load_users()
-    user = next((u for u in users if u["email"] == email), None)
-    return user and user.get("is_admin", False) 
 
 # --- Authentication Routes ---
 
@@ -124,7 +123,7 @@ def signup():
     if any(u["email"] == email for u in users):
         return jsonify({"error": "User already exists"}), 400
 
-    # IMPORTANT: Hash the password in a real application!
+   
     hashed_password = generate_password_hash(password)
 
     users.append({
@@ -145,7 +144,6 @@ def login():
     users = load_users()
     user = next((u for u in users if u["email"] == email), None)
 
-    # IMPORTANT: Check hashed password in a real application!
     if user and check_password_hash(user.get("password", ""), password):
         # Record login event
         login_history = load_login_history()
@@ -229,7 +227,6 @@ def github_callback():
     user = next((u for u in users if u["email"] == primary_email), None)
 
     if not user:
-        # If user doesn't exist, create a new one
         user = {
             "email": primary_email,
             "password": "",  
@@ -239,7 +236,7 @@ def github_callback():
         users.append(user)
         save_users(users)
 
-    # Record login event
+    
     login_history = load_login_history()
     login_history.append({
         "email": primary_email,
@@ -267,7 +264,7 @@ def google_login():
         user = next((u for u in users if u["email"] == email), None)
 
         if not user:
-            # If user doesn't exist, create a new one
+            
             user = {
                 "email": email,
                 "password": "", 
@@ -277,7 +274,7 @@ def google_login():
             users.append(user)
             save_users(users)
 
-        # Record login event
+        
         login_history = load_login_history()
         login_history.append({
             "email": email,
@@ -289,7 +286,7 @@ def google_login():
         return jsonify({"message": "Login successful", "access_token": access_token, "email": email}), 200
 
     except ValueError:
-        # Invalid token
+       
         return jsonify({"error": "Invalid Google token"}), 401
     except Exception as e:
         print(f"Google login error: {e}")
@@ -309,7 +306,7 @@ def predict():
         if not current_user_email:
             return jsonify({'error': 'Authentication required to make a prediction.'}), 401
 
-        # Validate all required columns are present
+        
         for col in columns:
             if col not in data:
                 return jsonify({'error': f"Missing data for required field: {col}"}), 400
@@ -325,7 +322,7 @@ def predict():
                     return jsonify({'error': f"Invalid purpose: {data[col]}. Must be one of {list(label_encoder.classes_)}"}), 400
             else:
                 try:
-                    # Ensure the value is not None or empty string before converting to float
+                    
                     value = data.get(col)
                     if value is None or value == '':
                          return jsonify({'error': f"Field '{col}' cannot be empty."}), 400
@@ -341,24 +338,33 @@ def predict():
         df[numerical_cols] = scaler.transform(df[numerical_cols])
 
         prediction = model.predict(df)[0]
-        probability_non_repaid = model.predict_proba(df)[0][1]
+       
+        probability_non_repaid = model.predict_proba(df)[0][1] 
 
-        result = 'Loan Likely to be Repaid' if prediction == 0 else 'Loan at Risk of Non-Repayment'
-        confidence_value = (1 - probability_non_repaid) * 100 if prediction == 0 else probability_non_repaid * 100
-        confidence = f"{confidence_value:.2f}%"
+        
+        if prediction == 0:
+            result = 'Loan Likely to be Repaid'
+            confidence_value = 1 - probability_non_repaid
+        else: 
+            result = 'Loan at Risk of Non-Repayment'
+            confidence_value = probability_non_repaid
+
+ 
+        confidence_display = f"{(confidence_value * 100):.2f}%"
 
         entry = {
             "email": current_user_email,
             "input": data,
             "result": result,
-            "confidence": confidence,
+            "confidence": confidence_value,  
             "timestamp": datetime.now().isoformat()
         }
         history = load_history()
         history.append(entry)
         save_history(history)
 
-        return jsonify({'result': result, 'confidence': confidence})
+       
+        return jsonify(entry)
 
     except Exception as e:
         print(f"Prediction error: {e}")
@@ -446,52 +452,6 @@ def get_recent_predictions_admin():
         reverse=True
     )[:limit]
     return jsonify(recent_predictions)
-
-# --- Admin Users Management (from blueprint, ensure it's protected) ---
-# Assuming your admin_users blueprint will handle /admin/users and /admin/users/delete
-# Make sure those routes in your blueprint are also protected with @jwt_required()
-# and check for admin status using is_user_admin(get_jwt_identity())
-
-# --- Admin Predictions (from blueprint, ensure it's protected) ---
-# Your existing /admin/predictions route in predictions_bp will need protection
-# and to load from history.json (or a dedicated predictions.json if you have one)
-# Make sure it's protected with @jwt_required() and checks for admin status.
-# The `get_all_predictions` in your original app.py was trying to read from users.json
-# for predictions, which seems incorrect. It should read from history.json.
-
-# Example for admin_predictions blueprint (routes/admin_predictions.py)
-# You need to ensure this is correctly implemented and protected:
-# from flask import Blueprint, jsonify, request
-# from flask_jwt_extended import jwt_required, get_jwt_identity
-# from app import load_history, is_user_admin # Import necessary functions from app.py
-
-# predictions_bp = Blueprint('predictions_bp', __name__)
-
-# @predictions_bp.route("/admin/predictions", methods=["GET"])
-# @jwt_required()
-# def get_all_predictions_admin_panel():
-#     current_user_email = get_jwt_identity()
-#     if not is_user_admin(current_user_email):
-#         return jsonify({"message": "Access Forbidden: Not an admin"}), 403
-
-#     try:
-#         all_predictions_data = load_history() # Load from history.json
-#         # You might want to format this data for the frontend if needed
-#         # For example, if you need a 'user' field instead of 'email' from history entry
-#         formatted_predictions = []
-#         for pred in all_predictions_data:
-#             formatted_predictions.append({
-#                 "id": pred.get("id", str(uuid.uuid4())), # Add an ID if not present
-#                 "user": pred.get("email", "N/A"),
-#                 "date": pred.get("timestamp", "N/A"),
-#                 "status": pred.get("result", "N/A"), # Map result to status
-#                 "model": "N/A" # You don't store model name in history.json, might need to add it
-#             })
-#         formatted_predictions.sort(key=lambda x: x.get("date", ""), reverse=True) # Sort by date
-#         return jsonify({"success": True, "data": formatted_predictions})
-#     except Exception as e:
-#         return jsonify({"success": False, "error": str(e)}), 500
-
 
 if __name__ == '__main__':
 
