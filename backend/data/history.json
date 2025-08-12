@@ -547,5 +547,27 @@
         "result": "Loan Likely to be Repaid",
         "confidence": 0.675,
         "timestamp": "2025-08-10T13:10:15.807267"
+    },
+    {
+        "email": "test@demo.com",
+        "input": {
+            "credit.policy": 1,
+            "purpose": "small_business",
+            "int.rate": 7.2,
+            "installment": 1500,
+            "log.annual.inc": 5,
+            "dti": 10.4,
+            "credit_score_type": "fico",
+            "fico": 652,
+            "days.with.cr.line": 2000,
+            "revol.bal": 15200,
+            "revol.util": 20,
+            "inq.last.6mths": 1,
+            "delinq.2yrs": 1,
+            "pub.rec": 0
+        },
+        "result": "Loan Likely to be Repaid",
+        "confidence": 0.6533333333333333,
+        "timestamp": "2025-08-10T13:22:58.438683"
     }
 ]

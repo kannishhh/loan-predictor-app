@@ -19,11 +19,9 @@ const PredictionResult = ({ result, pdfRef, pdfLoading, setPdfLoading }) => {
   const { width, height } = useWindowSize();
 
   const getChartData = (predictionResult) => {
-    if (!predictionResult || !predictionResult.confidence) return null;
+    if (predictionResult?.confidence == null) return null;
 
-    const confidenceValue = parseFloat(
-      predictionResult.confidence.replace(/[^\d.]/g, "")
-    );
+    const confidenceValue = parseFloat(predictionResult.confidence) * 100;
     const isRepaid = predictionResult.result?.includes("Repaid");
 
     const mainColor = isRepaid ? "#10B981" : "#F59E0B";
@@ -186,7 +184,7 @@ const PredictionResult = ({ result, pdfRef, pdfLoading, setPdfLoading }) => {
             </h2>
 
             <p className="text-xl text-gray-700 font-semibold mb-6">
-              {result.confidence}
+              Confidence: {(result.confidence * 100).toFixed(2)}%
             </p>
 
             {getChartData(result) && (
@@ -194,7 +192,7 @@ const PredictionResult = ({ result, pdfRef, pdfLoading, setPdfLoading }) => {
                 <Doughnut data={getChartData(result)} options={chartOptions} />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <span className="text-3xl font-bold text-gray-800">
-                    {parseFloat(result.confidence.replace(/[^\d.]/g, ""))} %
+                    {(result.confidence * 100).toFixed(0)}%
                   </span>
                 </div>
               </div>

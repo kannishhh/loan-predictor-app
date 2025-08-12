@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import {
@@ -7,6 +7,9 @@ import {
   RocketLaunchIcon,
   ClockIcon,
 } from "@heroicons/react/24/outline";
+
+// Importing Firebase functions
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 // Importing our shared context
 import { PredictionContext } from "../context/PredictionContext";
@@ -28,20 +31,25 @@ import {
 } from "../constants/predictorConstants";
 
 const Predictor = ({ onLogout }) => {
-  const { handleNewPrediction } = useContext(PredictionContext);
+  const { db, userId } = useContext(PredictionContext);
 
   const [form, setForm] = useState(initialForm);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [isDbReady, setIsDbReady] = useState(false);
+
+  useEffect(() => {
+    if (db && userId) {
+      setIsDbReady(true);
+    }
+  }, [db, userId]);
 
   const pdfRef = useRef();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     let processedValue = value;
-
     if (
       Object.keys(initialForm).includes(name) &&
       name !== "purpose" &&
@@ -51,7 +59,6 @@ const Predictor = ({ onLogout }) => {
     } else if (name === "purpose") {
       processedValue = value.toLowerCase().replace(" ", "_");
     }
-
     setForm({
       ...form,
       [name]: processedValue,
@@ -62,6 +69,12 @@ const Predictor = ({ onLogout }) => {
     e.preventDefault();
     setLoading(true);
     setResult(null);
+
+    if (!isDbReady) {
+      toast.error("Database connection is not ready. Please try again.");
+      setLoading(false);
+      return;
+    }
 
     for (const key in form) {
       const value = form[key];
@@ -76,53 +89,28 @@ const Predictor = ({ onLogout }) => {
       }
     }
 
-    const token = localStorage.getItem("userToken");
-    if (!token) {
-      toast.error("You must be logged in to make a prediction.");
-      setLoading(false);
-      return;
-    }
-
-    // const userEmail = localStorage.getItem("userEmail") || "guest";
-    // const userId = crypto.randomUUID();
-
     try {
-      const response = await fetch("http://localhost:5000/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
+      const mockPrediction =
+        Math.random() > 0.5
+          ? "Loan Likely to be Repaid"
+          : "Loan at Risk of Non-Repayment";
 
-      const data = await response.json();
+      const predictionData = {
+        input: form,
+        result: mockPrediction,
+        timestamp: serverTimestamp(),
+        user: userId,
+      };
 
-      if (response.ok) {
-        // The backend now returns the full entry object, including the correct timestamp and confidence value.
-        const entry = data; 
-        
-        // The result for display now needs to be formatted from the raw confidence
-        const displayResult = {
-          result: entry.result,
-          confidence: `${(entry.confidence * 100).toFixed(2)}%`
-        };
-        setResult(displayResult);
+      const userPredictionsRef = collection(db, "users", userId, "predictions");
+      await addDoc(userPredictionsRef, predictionData);
 
-        // Use the consistent entry from the backend for context updates
-        handleNewPrediction(entry);
-        toast.success("Prediction successful!");
-
-        // No longer need to manually manage local storage history here,
-        // as the History page fetches fresh data from the backend.
-      } else {
-        setResult({ error: data.error || "Prediction failed." });
-        toast.error(data.error || "Prediction failed.");
-      }
+      setResult({ result: mockPrediction, confidence: Math.random() });
+      toast.success("Prediction saved successfully!");
     } catch (error) {
-      console.error("Prediction server error:", error);
-      setResult({ error: "Server error. Please try again later." });
-      toast.error("Server error. Please try again later.");
+      console.error("Prediction server or database error:", error);
+      setResult({ error: "Server or database error. Please try again later." });
+      toast.error("Prediction failed due to a server or database error.");
     } finally {
       setLoading(false);
     }
@@ -137,16 +125,11 @@ const Predictor = ({ onLogout }) => {
             Loan Repayment Predictor
           </h1>
           <button
-            onClick={() => {
-              localStorage.removeItem("isLoggedIn");
-              localStorage.removeItem("userToken");
-              localStorage.removeItem("userEmail");
-              onLogout();
-            }}
+            onClick={onLogout}
             className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             <ArrowLeftStartOnRectangleIcon className="h-5 w-5" />
-            <span>Logout</span>
+            <span>Logout </span>
           </button>
         </div>
 
@@ -163,7 +146,6 @@ const Predictor = ({ onLogout }) => {
             IconComponent={getIconForField("credit.policy")}
             capitalizeOptions={false}
           />
-
           <PredictorSelector
             name="purpose"
             label={labelMap.purpose}
@@ -172,6 +154,18 @@ const Predictor = ({ onLogout }) => {
             options={purposeOptions}
             IconComponent={getIconForField("purpose")}
             capitalizeOptions={true}
+          />
+          <PredictorSelector
+            name="credit_score_type"
+            label={labelMap["credit_score_type"]}
+            value={form.credit_score_type}
+            onChange={handleChange}
+            options={creditScoreOptions.map((option) => ({
+              value: option.value,
+              label: option.label,
+            }))}
+            IconComponent={getIconForField("credit_score_type")}
+            capitalizeOptions={false}
           />
 
           <PredictorSelector
@@ -212,7 +206,7 @@ const Predictor = ({ onLogout }) => {
             <button
               type="submit"
               className="flex items-center justify-center space-x-3 bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg shadow-md transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-              disabled={loading}
+              disabled={loading || !isDbReady}
             >
               {loading ? (
                 <>
@@ -222,7 +216,7 @@ const Predictor = ({ onLogout }) => {
               ) : (
                 <>
                   <RocketLaunchIcon className="h-6 w-6" />
-                  <span>Predict</span>
+                  <span>Predict </span>
                 </>
               )}
             </button>
@@ -238,7 +232,6 @@ const Predictor = ({ onLogout }) => {
                 pdfLoading={pdfLoading}
                 setPdfLoading={setPdfLoading}
               />
-
               <PredictionChart
                 ficoScore={form.fico}
                 predictionResult={result.prediction}
@@ -254,7 +247,7 @@ const Predictor = ({ onLogout }) => {
           className="inline-flex items-center space-x-2 text-purple-500 hover:text-purple-600 font-medium px-6 py-3 rounded-lg border-2 border-purple-500 hover:border-purple-600 transition duration-300 ease-in-out shadow-sm hover:shadow-md"
         >
           <ClockIcon className="h-5 w-5" />
-          <span>View Prediction History</span>
+          <span>View Prediction History </span>
         </Link>
       </div>
     </div>

@@ -8,8 +8,10 @@ import {
   ArrowRightEndOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { GoogleLogin } from "@react-oauth/google";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
-const Signup = ({ setIsLoggedIn }) => {
+const Signup = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
@@ -27,22 +29,12 @@ const Signup = ({ setIsLoggedIn }) => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        toast.success("Signup successful! Please login.");
-        navigate("/login");
-      } else {
-        toast.error(data.error || "Signup failed");
-      }
+      await createUserWithEmailAndPassword(auth, form.email, form.password);
+      toast.success("Signup successful! Please login.");
+      navigate("/login");
     } catch (error) {
-      console.error("Signup server error:", error);
-      toast.error("Server error. Try again.");
+      console.error("Firebase signup error:", error);
+      toast.error(error.message || "Signup failed");
     }
   };
 
@@ -57,10 +49,7 @@ const Signup = ({ setIsLoggedIn }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem("userToken", data.access_token);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", data.email);
-        setIsLoggedIn(true);
+       
         toast.success("Login successful!");
         navigate("/predict");
       } else {

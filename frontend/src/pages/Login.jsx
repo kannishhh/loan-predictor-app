@@ -8,8 +8,10 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { GoogleLogin } from "@react-oauth/google";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
-const Login = ({ setIsLoggedIn }) => {
+const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
@@ -27,27 +29,12 @@ const Login = ({ setIsLoggedIn }) => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("userToken", data.access_token);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", form.email);
-        setIsLoggedIn(true);
-        toast.success("Login successful!");
-        navigate("/predict");
-      } else {
-        toast.error(data.error || "Invalid credentials");
-      }
+      await signInWithEmailAndPassword(auth, form.email, form.password);
+      toast.success("Login successful!");
+      navigate("/predict");
     } catch (error) {
-      console.error("Login server error:", error);
-      toast.error("Server error. Try again.");
+      console.error("Firebase login error:", error);
+      toast.error(error.message || "Invalid credentials");
     }
   };
 
@@ -62,10 +49,6 @@ const Login = ({ setIsLoggedIn }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem("userToken", data.access_token);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", data.email);
-        setIsLoggedIn(true);
         toast.success("Login successful!");
         navigate("/predict");
       } else {
@@ -226,15 +209,6 @@ const Login = ({ setIsLoggedIn }) => {
               </button>
             </div>
           </div>
-          <p className="text-center text-sm text-gray-500 mt-2">
-            Are you an admin?{" "}
-            <Link
-              to="/admin-login"
-              className="font-medium text-purple-500 hover:underline"
-            >
-              Login as Admin
-            </Link>
-          </p>
         </div>
       </div>
     </div>

@@ -1,6 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import {
+  collection,
+  query,
+  onSnapshot,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import {
   ArrowUturnLeftIcon,
   TrashIcon,
@@ -8,97 +16,75 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 
+// Import PredictionContext to get real-time data
+import { PredictionContext } from "../context/PredictionContext";
+
 const History = () => {
-  const [history, setHistory] = useState([]);
+  const { db, userId } = useContext(PredictionContext);
+
+  const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const navigate = useNavigate();
 
-  const userEmail = localStorage.getItem("userEmail");
-  const userToken = localStorage.getItem("userToken");
-
+  // --- Firestore Real-time Listener for User's Predictions ---
   useEffect(() => {
-    const fetchHistory = async () => {
-      if (!userEmail || !userToken) {
-        toast.error("Please login to view history.");
-        navigate("/login");
-        return;
-      }
+    if (db && userId) {
       setLoading(true);
-      try {
-        const res = await fetch(
-          `http://localhost:5000/history?email=${encodeURIComponent(
-            userEmail
-          )}`,
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setHistory(data);
-        } else if (res.status === 401 || res.status === 403) {
-          toast.error("Session expired or unauthorized. Please login again.");
-          localStorage.removeItem("isLoggedIn");
-          localStorage.removeItem("userToken");
-          localStorage.removeItem("userEmail");
-          navigate("/login");
-        } else {
-          console.error("Failed to fetch history:", res.status, res.statusText);
-          toast.error("Failed to load history.");
-          setHistory([]);
-        }
-      } catch (error) {
-        console.error("Error fetching history:", error);
-        toast.error("Server error when loading history. Try again.");
-        setHistory([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
-  }, [userEmail, userToken, navigate]);
+      const q = query(collection(db, "users", userId, "predictions"));
 
-  const clearHistory = async () => {
-    if (!userEmail || !userToken) {
-      toast.error("Please login to clear history.");
-      navigate("/login");
-      return;
-    }
-    if (
-      !window.confirm(
-        "Are you sure you want to clear all prediction history? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
-    try {
-      const res = await fetch(
-        `http://localhost:5000/history?email=${encodeURIComponent(userEmail)}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          const userPredictions = snapshot.docs.map((document) => ({
+            id: document.id,
+            ...document.data(),
+          }));
+
+          const sortedUserPredictions = userPredictions.sort((a, b) => {
+            const timestampA = a.timestamp?.seconds || 0;
+            const timestampB = b.timestamp?.seconds || 0;
+            return timestampB - timestampA;
+          });
+
+          setPredictions(sortedUserPredictions);
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Error fetching user's predictions:", error);
+          setLoading(false);
+          toast.error("Failed to load history.");
         }
       );
-      if (res.ok) {
-        setHistory([]);
-        toast.success("Prediction history cleared!");
-      } else if (res.status === 401 || res.status === 403) {
-        toast.error("Session expired or unauthorized. Please login again.");
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("userToken");
-        localStorage.removeItem("userEmail");
-        navigate("/login");
-      } else {
-        console.error("Failed to clear history:", res.status, res.statusText);
-        toast.error("Failed to clear history. Please try again.");
-      }
+
+      return () => unsubscribe();
+    } else {
+      setLoading(false);
+    }
+  }, [db, userId]);
+
+  const clearHistory = async () => {
+    if (!db || !userId) {
+      toast.error("Database is not ready. Please try again.");
+      return;
+    }
+
+    setShowConfirmModal(false);
+
+    try {
+      const userPredictionsRef = collection(db, "users", userId, "predictions");
+      const querySnapshot = await getDocs(userPredictionsRef);
+
+      const deletePromises = querySnapshot.docs.map((document) =>
+        deleteDoc(doc(db, "users", userId, "predictions", document.id))
+      );
+
+      await Promise.all(deletePromises);
+
+      toast.success("Prediction history cleared!");
     } catch (error) {
       console.error("Error clearing history:", error);
-      toast.error("Server error when clearing history. Try again.");
+      toast.error("Failed to clear history. Please try again.");
     }
   };
 
@@ -139,7 +125,7 @@ const History = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {history.length === 0 ? (
+              {predictions.length === 0 ? (
                 <tr>
                   <td
                     colSpan="3"
@@ -160,13 +146,15 @@ const History = () => {
                   </td>
                 </tr>
               ) : (
-                history.map((h, i) => (
+                predictions.map((h, i) => (
                   <tr
                     key={h.id || i}
                     className="hover:bg-purple-500/5 transition-colors duration-150 ease-in-out"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {new Date(h.timestamp).toLocaleString()}
+                      {h.timestamp?.seconds
+                        ? new Date(h.timestamp.seconds * 1000).toLocaleString()
+                        : "N/A"}
                     </td>
                     <td
                       className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${
@@ -179,10 +167,8 @@ const History = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {h.confidence &&
-                        !isNaN((h.confidence)) &&
-                        `${(parseFloat(h.confidence) * 100).toFixed(2)}% chance of ${
-                          h.result?.includes("Repaid") ? "repayment" : "default"
-                        }`}
+                        !isNaN(h.confidence) &&
+                        `${(parseFloat(h.confidence) * 100).toFixed(2)}%`}
                     </td>
                   </tr>
                 ))
@@ -200,15 +186,43 @@ const History = () => {
             <span>Go Back</span>
           </button>
           <button
-            onClick={clearHistory}
-            className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            disabled={history.length === 0}
+            onClick={() => setShowConfirmModal(true)}
+            className="flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={predictions.length === 0}
           >
             <TrashIcon className="h-5 w-5" />
             <span>Clear All</span>
           </button>
         </div>
       </div>
+
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+          <div className="relative p-8 bg-white w-96 rounded-lg shadow-lg">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Confirm Deletion
+            </h3>
+            <p className="text-gray-700">
+              Are you sure you want to clear all prediction history? This action
+              cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={clearHistory}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Clear History
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
