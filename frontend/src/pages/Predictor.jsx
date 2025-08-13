@@ -105,7 +105,9 @@ const Predictor = ({ onLogout }) => {
       const userPredictionsRef = collection(db, "users", userId, "predictions");
       await addDoc(userPredictionsRef, predictionData);
 
-      setResult({ result: mockPrediction, confidence: Math.random() });
+      const newResult = { result: mockPrediction, confidence: Math.random() };
+      setResult(newResult);
+      console.log("Prediction Result:", newResult); // Add this line for debugging
       toast.success("Prediction saved successfully!");
     } catch (error) {
       console.error("Prediction server or database error:", error);
@@ -168,7 +170,7 @@ const Predictor = ({ onLogout }) => {
             capitalizeOptions={false}
           />
 
-          <PredictorSelector
+          {/* <PredictorSelector
             name="credit_score_type"
             label={labelMap["credit_score_type"]}
             value={form.credit_score_type}
@@ -179,7 +181,7 @@ const Predictor = ({ onLogout }) => {
             }))}
             IconComponent={getIconForField("credit_score_type")}
             capitalizeOptions={false}
-          />
+          /> */}
 
           {Object.keys(initialForm)
             .filter(

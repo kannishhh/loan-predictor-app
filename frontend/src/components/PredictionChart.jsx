@@ -9,19 +9,12 @@ import {
   LabelList,
 } from 'recharts';
 
-<<<<<<< HEAD
 // This is a simple, client-side function to simulate data for the chart.
 // In a real-world scenario, this data would come from the backend.
 const generateChartData = (currentFico) => {
   const scores = [600, 650, 700, 750, 800, 850];
   const chartData = scores.map((score) => {
     // Generate a simple, convincing probability based on FICO score
-=======
-const generateChartData = (currentFico) => {
-  const scores = [600, 650, 700, 750, 800, 850];
-  const chartData = scores.map((score) => {
-    
->>>>>>> 709f5d8 (remove all admin components)
     let probability;
     if (score < 660) {
       probability = Math.min(Math.round(Math.random() * (score - 600) * 0.5 + 50), 75);
@@ -29,31 +22,18 @@ const generateChartData = (currentFico) => {
       probability = Math.min(Math.round(Math.random() * (score - 660) * 0.8 + 75), 99);
     }
 
-<<<<<<< HEAD
     return {
       name: `FICO ${score}`,
       probability,
       fill: score === parseInt(currentFico) ? '#8b5cf6' : '#c4b5fd',
       isCurrent: score === parseInt(currentFico),
-=======
-    const isCurrent = currentFico && score === parseInt(currentFico, 10);
-    return {
-      name: `FICO ${score}`,
-      probability,
-      fill: isCurrent ? '#8b5cf6' : '#c4b5fd',
-      isCurrent: isCurrent,
->>>>>>> 709f5d8 (remove all admin components)
     };
   });
 
   return chartData;
 };
 
-<<<<<<< HEAD
-const PredictionChart = ({ ficoScore, predictionResult }) => {
-=======
 const PredictionChart = ({ ficoScore }) => {
->>>>>>> 709f5d8 (remove all admin components)
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -76,11 +56,7 @@ const PredictionChart = ({ ficoScore }) => {
   };
 
   const CustomLabel = (props) => {
-<<<<<<< HEAD
-    const { x, y, width, height, value } = props;
-=======
     const { x, y, width, value } = props;
->>>>>>> 709f5d8 (remove all admin components)
     return (
       <text
         x={x + width / 2}
