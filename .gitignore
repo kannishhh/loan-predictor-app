@@ -23,6 +23,9 @@ users.json
 *.log
 .DS_Store
 
-
-#Node Modules
+# Node Modules
 node_modules/
+
+
+Loan_Repayment_Prediction.ipynb
+Loan_Repayment_Prediction.pdf

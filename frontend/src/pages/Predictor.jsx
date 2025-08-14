@@ -95,19 +95,20 @@ const Predictor = ({ onLogout }) => {
           ? "Loan Likely to be Repaid"
           : "Loan at Risk of Non-Repayment";
 
+      const confidence = Math.random();
       const predictionData = {
         input: form,
         result: mockPrediction,
         timestamp: serverTimestamp(),
         user: userId,
+        confidence: confidence,
       };
 
       const userPredictionsRef = collection(db, "users", userId, "predictions");
       await addDoc(userPredictionsRef, predictionData);
 
-      const newResult = { result: mockPrediction, confidence: Math.random() };
+      const newResult = { result: mockPrediction, confidence: confidence };
       setResult(newResult);
-      console.log("Prediction Result:", newResult); // Add this line for debugging
       toast.success("Prediction saved successfully!");
     } catch (error) {
       console.error("Prediction server or database error:", error);
@@ -169,19 +170,6 @@ const Predictor = ({ onLogout }) => {
             IconComponent={getIconForField("credit_score_type")}
             capitalizeOptions={false}
           />
-
-          {/* <PredictorSelector
-            name="credit_score_type"
-            label={labelMap["credit_score_type"]}
-            value={form.credit_score_type}
-            onChange={handleChange}
-            options={creditScoreOptions.map((option) => ({
-              value: option.value,
-              label: option.label,
-            }))}
-            IconComponent={getIconForField("credit_score_type")}
-            capitalizeOptions={false}
-          /> */}
 
           {Object.keys(initialForm)
             .filter(

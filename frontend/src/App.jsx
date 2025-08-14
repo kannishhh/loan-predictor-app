@@ -24,7 +24,6 @@ const ProtectedRoute = ({ children, userId }) => {
 };
 
 function App() {
-
   const [allPredictions, setAllPredictions] = useState([]);
   const [userId, setUserId] = useState(null);
 
@@ -79,8 +78,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
-            {/* Admin routes have been removed */}
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
