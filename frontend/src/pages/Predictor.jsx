@@ -11,16 +11,15 @@ import {
 // Importing Firebase functions
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-// Importing our shared context
+// Import PredictionContext
 import { PredictionContext } from "../context/PredictionContext";
 
-// Importing sub-components
+// Import sub-components
 import PredictionResult from "../components/predictor/PredictionResult";
 import PredictorSelector from "../components/predictor/PredictorSelector";
 import PredictorInputs from "../components/predictor/PredictorInputs";
-import PredictionChart from "../components/PredictionChart";
 
-// Importing constants, now including the new credit score options
+// Import constants
 import {
   initialForm,
   purposeOptions,
@@ -36,7 +35,6 @@ const Predictor = ({ onLogout }) => {
   const [form, setForm] = useState(initialForm);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [pdfLoading, setPdfLoading] = useState(false);
   const [isDbReady, setIsDbReady] = useState(false);
 
   useEffect(() => {
@@ -90,28 +88,49 @@ const Predictor = ({ onLogout }) => {
     }
 
     try {
-      const mockPrediction =
-        Math.random() > 0.5
-          ? "Loan Likely to be Repaid"
-          : "Loan at Risk of Non-Repayment";
+      const backendResponse = await fetch("http://localhost:5000/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-      const confidence = Math.random();
+      if (!backendResponse.ok) {
+        const errorData = await backendResponse.json();
+        throw new Error(errorData.error || "Backend prediction failed");
+      }
+
+      const backendResult = await backendResponse.json();
+
+      const predictionText = backendResult.result;
+      const confidenceValue = backendResult.confidence;
+
       const predictionData = {
         input: form,
-        result: mockPrediction,
+        result: predictionText,
+        prediction: predictionText,
         timestamp: serverTimestamp(),
-        user: userId,
-        confidence: confidence,
+        userId: userId,
+        confidence: confidenceValue,
       };
 
-      const userPredictionsRef = collection(db, "users", userId, "predictions");
-      await addDoc(userPredictionsRef, predictionData);
+      const predictionsCollectionRef = collection(
+        db,
+        "users",
+        userId,
+        "predictions"
+      );
+      await addDoc(predictionsCollectionRef, predictionData);
 
-      const newResult = { result: mockPrediction, confidence: confidence };
+      const newResult = {
+        result: predictionText,
+        confidence: confidenceValue,
+      };
       setResult(newResult);
       toast.success("Prediction saved successfully!");
     } catch (error) {
-      console.error("Prediction server or database error:", error);
+      console.error("Database error:", error);
       setResult({ error: "Server or database error. Please try again later." });
       toast.error("Prediction failed due to a server or database error.");
     } finally {
@@ -127,19 +146,29 @@ const Predictor = ({ onLogout }) => {
             <ChartPieIcon className="h-10 w-10 text-purple-500 mr-3" />
             Loan Repayment Predictor
           </h1>
-          <button
-            onClick={onLogout}
-            className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-          >
-            <ArrowLeftStartOnRectangleIcon className="h-5 w-5" />
-            <span>Logout </span>
-          </button>
+          <div className="flex items-center space-x-4">
+            <Link
+              to="/dashboard"
+              className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+            >
+              <ClockIcon className="h-5 w-5" />
+              <span>Dashboard </span>
+            </Link>
+            <button
+              onClick={onLogout}
+              className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              <ArrowLeftStartOnRectangleIcon className="h-5 w-5" />
+              <span>Logout </span>
+            </button>
+          </div>
         </div>
 
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
         >
+          {/* Selectors */}
           <PredictorSelector
             name="credit.policy"
             label={labelMap["credit.policy"]}
@@ -219,27 +248,13 @@ const Predictor = ({ onLogout }) => {
               <PredictionResult
                 result={result}
                 pdfRef={pdfRef}
-                pdfLoading={pdfLoading}
-                setPdfLoading={setPdfLoading}
-              />
-              <PredictionChart
-                ficoScore={form.fico}
-                predictionResult={result.prediction}
+                setPdfLoading={() => {}}
               />
             </div>
           </div>
         )}
       </div>
 
-      <div className="mt-12 text-center">
-        <Link
-          to="/history"
-          className="inline-flex items-center space-x-2 text-purple-500 hover:text-purple-600 font-medium px-6 py-3 rounded-lg border-2 border-purple-500 hover:border-purple-600 transition duration-300 ease-in-out shadow-sm hover:shadow-md"
-        >
-          <ClockIcon className="h-5 w-5" />
-          <span>View Prediction History </span>
-        </Link>
-      </div>
     </div>
   );
 };

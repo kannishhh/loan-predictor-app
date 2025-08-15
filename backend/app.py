@@ -84,20 +84,23 @@ def predict():
         if prediction == 0:
             result = 'Loan Likely to be Repaid'
             confidence_value = 1 - probability_non_repaid
-        else: 
+        else:
             result = 'Loan at Risk of Non-Repayment'
             confidence_value = probability_non_repaid
 
- 
+        # Ensure confidence_value is a finite number
+        if not np.isfinite(confidence_value):
+            confidence_value = 0.0 # Default to 0 if NaN or Inf
+
         confidence_display = f"{(confidence_value * 100):.2f}%"
 
         entry = {
             "input": data,
             "result": result,
-            "confidence": confidence_value,  
+            "confidence": confidence_value,
             "timestamp": datetime.now().isoformat()
         }
-       
+
         return jsonify(entry)
 
     except Exception as e:

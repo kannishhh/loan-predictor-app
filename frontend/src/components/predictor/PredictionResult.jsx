@@ -82,9 +82,9 @@ const PredictionResult = ({ result, pdfRef, pdfLoading, setPdfLoading }) => {
     };
 
     try {
-      element.style.width = '550px';
-      element.style.height = 'auto';
-      
+      element.style.width = "550px";
+      element.style.height = "auto";
+
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(element, {
@@ -93,7 +93,7 @@ const PredictionResult = ({ result, pdfRef, pdfLoading, setPdfLoading }) => {
         logging: false,
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 0.9); 
+      const imgData = canvas.toDataURL("image/jpeg", 0.9);
 
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -105,7 +105,7 @@ const PredictionResult = ({ result, pdfRef, pdfLoading, setPdfLoading }) => {
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const canvasAspectRatio = canvas.width / canvas.height;
 
-      let imgWidth = pdfWidth - 40; 
+      let imgWidth = pdfWidth - 40;
       let imgHeight = imgWidth / canvasAspectRatio;
 
       if (imgHeight > pdfHeight - 40) {
@@ -183,16 +183,12 @@ const PredictionResult = ({ result, pdfRef, pdfLoading, setPdfLoading }) => {
               {result.result}
             </h2>
 
-            <p className="text-xl text-gray-700 font-semibold mb-6">
-              Confidence: {(result.confidence * 100).toFixed(2)}%
-            </p>
-
             {getChartData(result) && (
-              <div className="relative w-60 h-60 mx-auto mb-6">
+              <div className="relative w-60 h-60 mx-auto mb-6 my-4">
                 <Doughnut data={getChartData(result)} options={chartOptions} />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-3xl font-bold text-gray-800">
-                    {(result.confidence * 100).toFixed(0)}%
+                  <span className="text-3xl  font-bold text-gray-800">
+                    {(result.confidence * 100).toFixed(2)}%
                   </span>
                 </div>
               </div>
