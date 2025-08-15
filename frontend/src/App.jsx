@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 // Import Firebase services
 import { db, auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, where, query } from "firebase/firestore";
 
 // Import page and layout components
 import Login from "./pages/Login";
@@ -51,7 +51,10 @@ function App() {
 
   useEffect(() => {
     if (userId) {
-      const q = collection(db, "users", userId, "predictions");
+      const q = query(
+        collection(db, "users", userId, "predictions"),
+        where("userId", "==", userId)
+      );
 
       const unsubscribe = onSnapshot(
         q,
@@ -79,7 +82,11 @@ function App() {
   };
 
   if (loading) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading user...</p>
+      </div>
+    );
   }
 
   return (
