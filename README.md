@@ -1,6 +1,6 @@
 # 🏦 Loan Eligibility Prediction App
 
-A full-stack Loan Prediction web application built with **React(Vite + Tailwind CSS)** for the frontend and **Flask** for the backend. It allows users to check loan approval eligibility using a machine learning model, view their prediction history, download results as a PDF, and now features centralized prediction storage with an admin dashboard.
+A full-stack Loan Prediction web application built with **React(Vite + Tailwind CSS)** for the frontend and **Flask** for the backend. It allows users to check loan approval eligibility using a machine learning model, view their prediction history, download results as a PDF. The project is now powered by Firebase for real-time data and authentication, focusing on a robust user experience.
 
 ---
 
@@ -12,7 +12,7 @@ A full-stack Loan Prediction web application built with **React(Vite + Tailwind 
 - 🎨 Tailwind CSS
 - 🧠 React Hooks & Routing
 - 📄 html2pdf.js for PDF generation
-- 📊 Chart.js & react-chartjs-2 for data visualization
+- 📊 Chart.js & react-chartjs-2 & Recharts for data visualization
 - ✨ Heroicons for modern UI icons
 - 🔥 Firebase (Authentication, Firestore Database) for user management and centralized data storage (upcoming)
 
@@ -26,14 +26,12 @@ A full-stack Loan Prediction web application built with **React(Vite + Tailwind 
 
 ## ✅ Current Features
 
-- 🔐 **User Authentication:** Secure login/logout flow with Firebase Authentication (supports anonymous and custom token authentication).
-- 📝 **Loan Prediction Form:** Intuitive form with labeled inputs and clear guidance.
-- 📊 **Enhanced Prediction Display:** Visually appealing results with a Doughnut Chart showing prediction confidence.
-- 📂 **Personal Prediction History:** Users can view their past predictions saved locally.
+- 🔐 **Secure User Authentication:** Implemented with Firebase Authentication for email/password and social logins (e.g., Google, GitHub).
+- 📝 **Loan Prediction Form:** An intuitive and enhanced form with dynamic inputs (FICO/CIBIL).
+- 📊 **User Dashboard:** A personalized landing page with a summary of user activity and a visual breakdown of past predictions.
+- 📂 **Real-time Prediction History:** Users can view their entire prediction history, with data fetched in real-time from Firestore.
 - 📄 **Export Prediction to PDF:** Download individual prediction results as a PDF report.
-- 🖥️ **Admin Dashboard:** A dedicated view for administrators to see all predictions made by all users in real-time.
-- ☁️ **Centralized Prediction Storage (Firestore):** All user predictions are securely stored in a Firebase Firestore database.(upcoming)
-- 🌓 **Dark Mode UI** (in future)
+- ☁️ **Centralized Prediction Storage (Firestore):** All user predictions are securely stored in a Firebase Firestore database.
 
 ---
 
@@ -51,32 +49,30 @@ A full-stack Loan Prediction web application built with **React(Vite + Tailwind 
 root/
 │
 ├── backend/ # Flask Backend
-│ ├── data/ # Raw or processed datasets
 │ ├── models/ # Trained model files (e.g., model.pkl, scaler.pkl)
-│ ├── templates/ # HTMLtemplates for Flask
 │ ├── app.py # Main Flask app
 │ ├── generate_pkl.py # Script to train and save model
 │ └── loan_data.csv # Dataset used for training
 │
 ├── frontend/ # Vite + React Frontend
+│ ├── assets/
 │ ├── src/
 │ │ ├── components/ # Reusable UI components
 │ │ │ ├── predictor/ # Components specific to the predictor page
 │ │ │ │    ├── PredictionResult.jsx
 │ │ │ │    ├── PredictorInputs.jsx
 │ │ │ │    └── PredictorSelector.jsx
+│ │ │ ├── shimmer/ 
 │ │ │ └── History.jsx
 │ │ ├── constants/ # Global constants like form initial state, labels, icons
 │ │ │ └── predictorConstants.js
+│ │ ├── context/ 
+│ │ │ └── PredictonContext.jsx
 │ │ ├── pages/ # Main pages (Home, Predictor, History)
 │ │ └── App.jsx
-│ ├── public/
 │ └── index.html
 │
 ├── .gitignore # Ignore node_modules, pycache, etc.
-├── Loan_Repayment_Prediction.ipynb # Jupyter notebook used for ML training
-├── Loan_Repayment_Prediction.pdf # PDF report
-├── requirements.txt # Backend dependencies
 └── README.md
 ```
 
@@ -129,6 +125,18 @@ npm run dev
 ```
 
 The frontend application will typically open in your browser at `http://localhost:5173` (or another port).
+
+### 🔥 Firebase Setup
+Follow these steps to set up your Firebase project.\
+
+- Create a Project: Go to the Firebase Console, create a new project, and add a web app.
+
+- Enable Authentication: In the "Authentication" section, enable the Email/Password and Anonymous sign-in providers.
+
+- Set up Firestore: In the "Firestore Database" section, create a database in production mode.
+
+- Update Security Rules: Set up security rules to allow read/write access for authenticated users to the /users/{userId}/predictions/{predictionId} path.
+
 
 ---
 
