@@ -17,6 +17,7 @@ import {
   RocketLaunchIcon,
   ClockIcon,
 } from "@heroicons/react/24/outline";
+import UserDashboardShimmer from "../components/shimmer/UserDashboardShimmer";
 
 const UserDashboard = () => {
   const { db, userId } = useContext(PredictionContext);
@@ -24,32 +25,35 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (db && userId) {
-      setLoading(true);
+    const timer = setTimeout(() => {
+      if (db && userId) {
+        setLoading(true);
 
-      const q = query(
-        collection(db, `users/${userId}/predictions`),
-        orderBy("timestamp", "desc")
-      );
+        const q = query(
+          collection(db, `users/${userId}/predictions`),
+          orderBy("timestamp", "desc")
+        );
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const userPredictions = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setPredictions(userPredictions);
-          setLoading(false);
-        },
-        (error) => {
-          console.error("Error fetching user's predictions:", error);
-          setLoading(false);
-        }
-      );
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            const userPredictions = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            setPredictions(userPredictions);
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Error fetching user's predictions:", error);
+            setLoading(false);
+          }
+        );
 
-      return () => unsubscribe();
-    }
+        return () => unsubscribe();
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
   }, [db, userId]);
 
   const totalPredictions = predictions.length;
@@ -66,11 +70,7 @@ const UserDashboard = () => {
   const PIE_COLORS = ["#10B981", "#EF4444"];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="animate-spin h-10 w-10 border-4 border-purple-500 rounded-full border-t-transparent"></div>
-      </div>
-    );
+    return <UserDashboardShimmer />;
   }
 
   return (
@@ -171,7 +171,7 @@ const UserDashboard = () => {
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Confidence:</span>{" "}
-                  {typeof latestPrediction.confidence === 'number'
+                  {typeof latestPrediction.confidence === "number"
                     ? `${(latestPrediction.confidence * 100).toFixed(2)}%`
                     : "N/A"}
                 </p>

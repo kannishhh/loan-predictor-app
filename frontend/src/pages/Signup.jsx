@@ -49,7 +49,7 @@ const Signup = () => {
     } catch (error) {
       console.error("Google signup error:", error);
       toast.error(error.message || "Google signup failed");
-    }
+    } 
   };
 
   const handleGitLogin = async () => {

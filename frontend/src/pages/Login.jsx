@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -13,10 +13,20 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth } from "../firebase";
+import LoginShimmer from "../components/shimmer/LoginShimmer";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500); 
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,7 +43,7 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, form.email, form.password);
       toast.success("Login successful!");
       navigate("/predict");
-    } catch (error) {
+    } catch (error){
       console.error("Firebase login error:", error);
       toast.error(error.message || "Invalid credentials");
     }
@@ -58,6 +68,10 @@ const Login = () => {
       toast.error(error.message || "GitHub login failed");
     }
   };
+
+  if (loading) {
+    return <LoginShimmer />;
+  }
 
   return (
     <div className="min-h-screen flex">
