@@ -77,9 +77,6 @@ def predict():
             if cibil_Score:
                 data['fico'] = float(cibil_Score) / 1000 * 850
 
-        # for col in columns:
-        #     if col not in data:
-        #         return jsonify({'error': f"Missing data for required field: {col}"}), 400
 
         input_data = {}
         for col in columns:
@@ -119,41 +116,30 @@ def predict():
         if not np.isfinite(confidence_value):
             confidence_value = 0.0 
 
-        # confidence_display = f"{(confidence_value * 100):.2f}%"
 
-        # entry = {
-        #     "input": data,
-        #     "result": result,
-        #     "confidence": confidence_value,
-        #     "timestamp": datetime.now().isoformat()
-        # }
-
-        # return jsonify(entry)
+        if db:
+            try:
+                user_predictions_ref = db.collection('users').document(uid).collection('predictions')
+                prediction_record ={
+                    "userId": uid,
+                    "result": result,
+                    "confidence": confidence_value,
+                    "timestamp": SERVER_TIMESTAMP,
+                    "input": data
+                }
+                user_predictions_ref.add(prediction_record)
+            except Exception as e:
+                print(f"Firestore save error: {e}")
+                return jsonify({'error': 'Failed to save prediction to database.'}), 500
+        
+        return jsonify({
+            "result": result,
+            "confidence": confidence_value
+        }), 200
 
     except Exception as e:
         print(f"Prediction error: {e}")
         return jsonify({'error': 'An unexpected error occurred during prediction.'}), 500
-    
-
-    if db:
-        try:
-            user_predictions_ref = db.collection('users').document(uid).collection('predictions')
-            prediction_record ={
-                "userId": uid,
-                "prediction": result,
-                "confidence": confidence_value,
-                "timestamp": SERVER_TIMESTAMP,
-                "input": data
-            }
-            user_predictions_ref.add(prediction_record)
-        except Exception as e:
-            print(f"Firestore save error: {e}")
-            return jsonify({'error': 'Failed to save prediction to database.'}), 500
-        
-    return jsonify({
-        "result": result,
-        "confidence": float(f"{(confidence_value * 100):.2f}%")
-    }), 200
 
 
 @app.route('/health', methods=['GET'])

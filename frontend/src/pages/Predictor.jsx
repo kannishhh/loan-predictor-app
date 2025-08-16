@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 // Importing Firebase functions
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { auth } from "../firebase";
 
 // Import PredictionContext
 import { PredictionContext } from "../context/PredictionContext";
@@ -18,6 +18,7 @@ import { PredictionContext } from "../context/PredictionContext";
 import PredictionResult from "../components/predictor/PredictionResult";
 import PredictorSelector from "../components/predictor/PredictorSelector";
 import PredictorInputs from "../components/predictor/PredictorInputs";
+
 
 // Import constants
 import {
@@ -28,7 +29,6 @@ import {
   creditPolicyOptions,
   creditScoreOptions,
 } from "../constants/predictorConstants";
-import PredictorShimmer from "../components/shimmer/PredictorShimmer";
 
 const Predictor = ({ onLogout }) => {
   const { db, userId } = useContext(PredictionContext);
@@ -37,16 +37,15 @@ const Predictor = ({ onLogout }) => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDbReady, setIsDbReady] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
       if (db && userId) {
         setIsDbReady(true);
         setLoading(false);
+      } else {
+        setLoading(true);
       }
-    }, 1500); 
-
-    return () => clearTimeout(timer);
   }, [db, userId]);
 
   const pdfRef = useRef();
@@ -94,10 +93,12 @@ const Predictor = ({ onLogout }) => {
     }
 
     try {
+      const idToken = await auth.currentUser.getIdToken(true);
       const backendResponse = await fetch("http://localhost:5000/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
         },
         body: JSON.stringify(form),
       });
@@ -112,22 +113,6 @@ const Predictor = ({ onLogout }) => {
       const predictionText = backendResult.result;
       const confidenceValue = backendResult.confidence;
 
-      const predictionData = {
-        input: form,
-        result: predictionText,
-        prediction: predictionText,
-        timestamp: serverTimestamp(),
-        userId: userId,
-        confidence: confidenceValue,
-      };
-
-      const predictionsCollectionRef = collection(
-        db,
-        "users",
-        userId,
-        "predictions"
-      );
-      await addDoc(predictionsCollectionRef, predictionData);
 
       const newResult = {
         result: predictionText,
@@ -144,9 +129,6 @@ const Predictor = ({ onLogout }) => {
     }
   };
 
-  if (loading) {
-    return <PredictorShimmer />;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6 flex flex-col items-center">
@@ -258,13 +240,13 @@ const Predictor = ({ onLogout }) => {
               <PredictionResult
                 result={result}
                 pdfRef={pdfRef}
-                setPdfLoading={() => {}}
+                pdfLoading={pdfLoading}
+                setPdfLoading={setPdfLoading}
               />
             </div>
           </div>
         )}
       </div>
-
     </div>
   );
 };

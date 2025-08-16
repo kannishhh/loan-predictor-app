@@ -58,7 +58,7 @@ const UserDashboard = () => {
 
   const totalPredictions = predictions.length;
   const repaidCount = predictions.filter((p) =>
-    p.prediction?.includes("Repaid")
+    p.result?.includes("Repaid")
   ).length;
   const defaultCount = totalPredictions - repaidCount;
   const latestPrediction = predictions[0];
@@ -161,12 +161,12 @@ const UserDashboard = () => {
                   <span className="font-semibold">Result:</span>{" "}
                   <span
                     className={`font-bold ${
-                      latestPrediction.prediction?.includes("Repaid")
+                      latestPrediction.result?.includes("Repaid")
                         ? "text-green-600"
                         : "text-red-600"
                     }`}
                   >
-                    {latestPrediction.prediction}
+                    {latestPrediction.result}
                   </span>
                 </p>
                 <p className="text-gray-700">

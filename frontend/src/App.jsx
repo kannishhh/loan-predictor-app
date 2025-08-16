@@ -17,6 +17,8 @@ import GithubCallback from "./pages/GithubCallback";
 import { PredictionContext } from "./context/PredictionContext";
 import UserDashboard from "./pages/UserDashboard";
 
+import PredictorShimmer from "./components/shimmer/PredictorShimmer";
+
 // --- Protected Route Component ---
 const ProtectedRoute = ({ children, userId }) => {
   if (!userId) {
@@ -81,13 +83,7 @@ function App() {
     toast.success("Logged out successfully!");
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading user...</p>
-      </div>
-    );
-  }
+  if (loading) return <PredictorShimmer />;
 
   return (
     <div>
