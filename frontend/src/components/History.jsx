@@ -16,8 +16,11 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 
-// Import PredictionContext to get real-time data
+// Import PredictionContext 
 import { PredictionContext } from "../context/PredictionContext";
+
+
+import HistoryShimmer from "../components/shimmer/HistoryShimmer";
 
 const History = () => {
   const { db, userId } = useContext(PredictionContext);
@@ -27,40 +30,42 @@ const History = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const navigate = useNavigate();
 
-  // --- Firestore Real-time Listener for User's Predictions ---
   useEffect(() => {
-    if (db && userId) {
-      setLoading(true);
-      const q = query(collection(db, "users", userId, "predictions"));
+    const timer = setTimeout(() => {
+      if (db && userId) {
+        setLoading(true);
+        const q = query(collection(db, "users", userId, "predictions"));
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const userPredictions = snapshot.docs.map((document) => ({
-            id: document.id,
-            ...document.data(),
-          }));
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            const userPredictions = snapshot.docs.map((document) => ({
+              id: document.id,
+              ...document.data(),
+            }));
 
-          const sortedUserPredictions = userPredictions.sort((a, b) => {
-            const timestampA = a.timestamp?.seconds || 0;
-            const timestampB = b.timestamp?.seconds || 0;
-            return timestampB - timestampA;
-          });
+            const sortedUserPredictions = userPredictions.sort((a, b) => {
+              const timestampA = a.timestamp?.seconds || 0;
+              const timestampB = b.timestamp?.seconds || 0;
+              return timestampB - timestampA;
+            });
 
-          setPredictions(sortedUserPredictions);
-          setLoading(false);
-        },
-        (error) => {
-          console.error("Error fetching user's predictions:", error);
-          setLoading(false);
-          toast.error("Failed to load history.");
-        }
-      );
+            setPredictions(sortedUserPredictions);
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Error fetching user's predictions:", error);
+            setLoading(false);
+            toast.error("Failed to load history.");
+          }
+        );
 
-      return () => unsubscribe();
-    } else {
-      setLoading(false);
-    }
+        return () => unsubscribe();
+      } else {
+        setLoading(false);
+      }
+    }, 1500);
+    return () => clearTimeout(timer);
   }, [db, userId]);
 
   const clearHistory = async () => {
@@ -89,14 +94,7 @@ const History = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex flex-col items-center text-gray-700">
-          <ClockIcon className="h-16 w-16 animate-pulse text-purple-500" />
-          <p className="mt-4 text-xl font-semibold">Loading history...</p>
-        </div>
-      </div>
-    );
+    return <HistoryShimmer />;
   }
 
   return (
@@ -120,7 +118,7 @@ const History = () => {
                   Result
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                  Confidence 
+                  Confidence
                 </th>
               </tr>
             </thead>
