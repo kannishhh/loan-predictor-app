@@ -28,19 +28,25 @@ import {
   creditPolicyOptions,
   creditScoreOptions,
 } from "../constants/predictorConstants";
+import PredictorShimmer from "../components/shimmer/PredictorShimmer";
 
 const Predictor = ({ onLogout }) => {
   const { db, userId } = useContext(PredictionContext);
 
   const [form, setForm] = useState(initialForm);
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isDbReady, setIsDbReady] = useState(false);
 
   useEffect(() => {
-    if (db && userId) {
-      setIsDbReady(true);
-    }
+    const timer = setTimeout(() => {
+      if (db && userId) {
+        setIsDbReady(true);
+        setLoading(false);
+      }
+    }, 1500); 
+
+    return () => clearTimeout(timer);
   }, [db, userId]);
 
   const pdfRef = useRef();
@@ -137,6 +143,10 @@ const Predictor = ({ onLogout }) => {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <PredictorShimmer />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6 flex flex-col items-center">
