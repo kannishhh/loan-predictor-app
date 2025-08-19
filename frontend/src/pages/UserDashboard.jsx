@@ -1,7 +1,6 @@
-import { useState, useEffect, useContext } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { PredictionContext } from "../context/PredictionContext";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import {
   PieChart,
   Pie,
@@ -20,58 +19,24 @@ import {
 import UserDashboardShimmer from "../components/shimmer/UserDashboardShimmer";
 
 const UserDashboard = () => {
-  const { db, userId } = useContext(PredictionContext);
-  const [predictions, setPredictions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { userPredictions } = useContext(PredictionContext);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (db && userId) {
-        setLoading(true);
+  const sortedPredictions = [...userPredictions].sort(
+    (a, b) => b.timestamp?.seconds - a.timestamp?.seconds
+  );
 
-        const q = query(
-          collection(db, `users/${userId}/predictions`),
-          orderBy("timestamp", "desc")
-        );
-
-        const unsubscribe = onSnapshot(
-          q,
-          (snapshot) => {
-            const userPredictions = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setPredictions(userPredictions);
-            setLoading(false);
-          },
-          (error) => {
-            console.error("Error fetching user's predictions:", error);
-            setLoading(false);
-          }
-        );
-
-        return () => unsubscribe();
-      }
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [db, userId]);
-
-  const totalPredictions = predictions.length;
-  const repaidCount = predictions.filter((p) =>
+  const totalPredictions = sortedPredictions.length;
+  const repaidCount = sortedPredictions.filter((p) =>
     p.result?.includes("Repaid")
   ).length;
   const defaultCount = totalPredictions - repaidCount;
-  const latestPrediction = predictions[0];
+  const latestPrediction = sortedPredictions[0];
 
   const pieChartData = [
     { name: "Repaid", value: repaidCount },
     { name: "Default", value: defaultCount },
   ];
   const PIE_COLORS = ["#10B981", "#EF4444"];
-
-  if (loading) {
-    return <UserDashboardShimmer />;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6">

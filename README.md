@@ -127,7 +127,7 @@ npm run dev
 The frontend application will typically open in your browser at `http://localhost:5173` (or another port).
 
 ### 🔥 Firebase Setup
-Follow these steps to set up your Firebase project.\
+Follow these steps to set up your Firebase project.
 
 - Create a Project: Go to the Firebase Console, create a new project, and add a web app.
 
