@@ -38,6 +38,10 @@ const UserDashboard = () => {
   ];
   const PIE_COLORS = ["#10B981", "#EF4444"];
 
+  if (!userPredictions || userPredictions.length === 0) {
+    return <UserDashboardShimmer />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans p-6">
       <div className="w-full max-w-5xl mx-auto bg-white p-8 rounded-xl shadow-lg">

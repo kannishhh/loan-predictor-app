@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  EnvelopeIcon,
-  LockClosedIcon,
-} from "@heroicons/react/24/outline";
+import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import welcomeImage from "../../assets/welcome_Image.png";
 import {
   GoogleAuthProvider,
@@ -23,7 +20,7 @@ const Login = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1500); 
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -43,7 +40,7 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, form.email, form.password);
       toast.success("Login successful!");
       navigate("/predict");
-    } catch (error){
+    } catch (error) {
       console.error("Firebase login error:", error);
       toast.error(error.message || "Invalid credentials");
     }
@@ -206,6 +203,9 @@ const Login = () => {
                 </span>
                 Login with GitHub
               </button>
+              <div className="mt-8 text-center text-sm text-gray-600">
+                &copy; {new Date().getFullYear()} Kanish Kainth. All Rights Reserved.
+              </div>
             </div>
           </div>
         </div>
